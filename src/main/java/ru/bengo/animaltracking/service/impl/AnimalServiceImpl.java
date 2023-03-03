@@ -7,6 +7,7 @@ import ru.bengo.animaltracking.model.Animal;
 import ru.bengo.animaltracking.repository.AnimalRepository;
 import ru.bengo.animaltracking.service.AnimalService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +23,7 @@ public class AnimalServiceImpl implements AnimalService {
     }
 
     @Override
-    public Optional<List<Animal>> search(String startDateTime, String endDateTime, Integer chipperId, Long chippingLocationId, String lifeStatus, String gender, Integer from, Integer size) {
+    public Optional<List<Animal>> search(LocalDateTime startDateTime, LocalDateTime endDateTime, Integer chipperId, Long chippingLocationId, String lifeStatus, String gender, Integer from, Integer size) {
         return Optional.empty();
     }
 
