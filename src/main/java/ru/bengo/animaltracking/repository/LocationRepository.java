@@ -6,7 +6,4 @@ import ru.bengo.animaltracking.model.Location;
 import java.util.Optional;
 
 public interface LocationRepository extends CrudRepository<Location, Long> {
-
-    @Override
-    Optional<Location> findById(Long id);
 }

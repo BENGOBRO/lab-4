@@ -1,7 +1,5 @@
 package ru.bengo.animaltracking.controller;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +17,8 @@ public class AccountController {
 
     private final AccountService accountService;
 
-    // @PostMapping("/registration")
-
     @GetMapping("/{accountId}")
-    public ResponseEntity<?> getAccountById(@PathVariable(value = "accountId") @NotBlank @Min(1) Integer id) {
+    public ResponseEntity<?> getAccountById(@PathVariable("accountId") Integer id) {
         Optional<Account> foundAccount = accountService.findById(id);
 
         if (foundAccount.isPresent()) {
@@ -35,8 +31,8 @@ public class AccountController {
     @GetMapping("/search")
     public ResponseEntity<?> searchAccounts(
             @RequestParam(required = false) Map<String, String> firstLastNamesAndEmailMap,
-            @RequestParam(defaultValue = "0") @Min(0) Integer from,
-            @RequestParam(defaultValue = "10") @Min(1) Integer size) {
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size) {
 
         String firstName = firstLastNamesAndEmailMap.get("firstName");
         String lastName = firstLastNamesAndEmailMap.get("lastName");

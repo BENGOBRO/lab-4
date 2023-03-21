@@ -6,7 +6,4 @@ import ru.bengo.animaltracking.model.AnimalType;
 
 @Repository
 public interface AnimalTypeRepository extends CrudRepository<AnimalType, Long> {
-
-
-
 }

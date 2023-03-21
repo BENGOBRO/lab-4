@@ -1,7 +1,7 @@
 package ru.bengo.animaltracking.controller;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -26,8 +26,7 @@ public class AnimalController {
     private final AnimalTypeService animalTypeService;
 
     @GetMapping("/{animalId}")
-    public ResponseEntity<?> getAnimalById(@PathVariable(value = "animalId") @NotNull @Min(1)
-                                               Integer id) {
+    public ResponseEntity<?> getAnimalById(@PathVariable(value = "animalId") Integer id) {
         Optional<Animal> foundAnimal = animalService.findById(id);
 
         if (foundAnimal.isPresent()) {
@@ -37,16 +36,15 @@ public class AnimalController {
         return ResponseEntity.notFound().build();
     }
 
-    //TODO добавить валидацию параметров запроса
     @GetMapping("/search")
     public ResponseEntity<?> searchAnimals(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
                                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime,
-                                           @RequestParam(required = false) @Min(1) Integer chipperId,
-                                           @RequestParam(required = false) @Min(1) Long chippingLocationId,
+                                           @RequestParam(required = false) Integer chipperId,
+                                           @RequestParam(required = false) Long chippingLocationId,
                                            @RequestParam(required = false) String lifeStatus,
                                            @RequestParam(required = false) String gender,
-                                           @RequestParam(defaultValue = "0") @Min(0) Integer from,
-                                           @RequestParam(defaultValue = "10") @Min(1) Integer size) {
+                                           @RequestParam(defaultValue = "0") Integer from,
+                                           @RequestParam(defaultValue = "10") Integer size) {
         Optional<List<Animal>> foundAnimals = animalService.search(startDateTime, endDateTime,
                 chipperId, chippingLocationId, lifeStatus, gender, from, size);
 
@@ -63,7 +61,7 @@ public class AnimalController {
     }
 
     @GetMapping("/types/{typeId}")
-    public ResponseEntity<?> getAnimalTypeById(@PathVariable @NotNull @Min(1) Long typeId) {
+    public ResponseEntity<?> getAnimalTypeById(@PathVariable Long typeId) {
         Optional<AnimalType> foundAnimalType = animalTypeService.getAnimalTypeById(typeId);
 
         if (foundAnimalType.isPresent()) {
@@ -79,12 +77,12 @@ public class AnimalController {
     }
 
     @PutMapping("/types/{typeId}")
-    public ResponseEntity<?> changeAnimalType(@PathVariable @NotNull @Min(1) Long typeId) {
+    public ResponseEntity<?> changeAnimalType(@PathVariable Long typeId) {
         return null;
     }
 
     @DeleteMapping("/types/{typeId}")
-    public ResponseEntity<?> deleteAnimalType(@PathVariable @NotNull @Min(1) Long typeId) {
+    public ResponseEntity<?> deleteAnimalType(@PathVariable Long typeId) {
         return null;
     }
 }

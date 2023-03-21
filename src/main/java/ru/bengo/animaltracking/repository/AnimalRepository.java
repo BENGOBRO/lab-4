@@ -6,8 +6,4 @@ import ru.bengo.animaltracking.model.Animal;
 import java.util.Optional;
 
 public interface AnimalRepository extends CrudRepository<Animal, Integer> {
-
-    @Override
-    Optional<Animal> findById(Integer id);
-
 }
