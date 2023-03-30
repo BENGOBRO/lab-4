@@ -1,6 +1,5 @@
 package ru.bengo.animaltracking.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -32,11 +31,6 @@ public class Account {
     @NotBlank
     @ToString.Exclude
     private String password;
-
-    @JsonIgnore
-    public String getPassword() {
-        return password;
-    }
 
     @JsonProperty
     public void setPassword(String password) {

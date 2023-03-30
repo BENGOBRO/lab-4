@@ -5,11 +5,17 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.bengo.animaltracking.exception.UserAlreadyExistException;
 import ru.bengo.animaltracking.model.Account;
 import ru.bengo.animaltracking.model.Message;
+import ru.bengo.animaltracking.model.User;
 import ru.bengo.animaltracking.repository.AccountRepository;
 import ru.bengo.animaltracking.service.AccountService;
 
@@ -18,10 +24,13 @@ import java.util.Optional;
 
 @Service
 @Validated
-public class AccountServiceImpl implements AccountService {
+public class AccountServiceImpl implements AccountService, UserDetailsService {
 
     @Autowired
     private AccountRepository accountRepository;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     @Override
     public Optional<Account> findById(@NotNull @Positive Integer id) {
@@ -47,6 +56,7 @@ public class AccountServiceImpl implements AccountService {
             throw new UserAlreadyExistException(Message.ACCOUNT_EXIST.getInfo());
         }
 
+        account.setPassword(passwordEncoder.encode(account.getPassword()));
         return accountRepository.save(account);
     }
 
@@ -68,4 +78,14 @@ public class AccountServiceImpl implements AccountService {
 
     }
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<Account> foundAccount = accountRepository.findAccountByEmail(username);
+
+        if (foundAccount.isPresent()) {
+            return new User(foundAccount.get());
+        }
+
+        throw new UsernameNotFoundException(username);
+    }
 }
