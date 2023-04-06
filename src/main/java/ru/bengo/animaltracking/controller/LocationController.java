@@ -16,8 +16,8 @@ public class LocationController {
     private final LocationService locationService;
 
     @GetMapping("/{pointId}")
-    public ResponseEntity<?> getLocation(@PathVariable Long pointId) {
-        Optional<Location> foundLocation = locationService.getLocation(pointId);
+    public ResponseEntity<?> getLocation(@PathVariable("pointId") Long id) {
+        Optional<Location> foundLocation = locationService.getLocation(id);
 
         if (foundLocation.isPresent()) {
             return ResponseEntity.ok(foundLocation.get());
@@ -32,9 +32,9 @@ public class LocationController {
     }
 
     @PutMapping("/{pointId}")
-    public ResponseEntity<?> changeLocation(@RequestBody Location location,
-                                            @PathVariable Long pointId) {
-        Location changedLocation = locationService.changeLocation(location, pointId);
+    public ResponseEntity<?> updateLocation(@RequestBody Location location,
+                                            @PathVariable("pointId") Long id) {
+        Location changedLocation = locationService.updateLocation(location, id);
 
         if (changedLocation != null) {
             return ResponseEntity.ok(changedLocation);
@@ -44,8 +44,13 @@ public class LocationController {
     }
 
     @DeleteMapping("/{pointId}")
-    public ResponseEntity<?> deleteLocation(@PathVariable Long pointId) {
-        locationService.deleteLocation(pointId);
+    public ResponseEntity<?> deleteLocation(@PathVariable("pointId") Long id) {
+        Long numOfDeletedEntities = locationService.deleteLocation(id);
+
+        if (numOfDeletedEntities == 0) {
+            return ResponseEntity.notFound().build();
+        }
+
         return ResponseEntity.ok().build();
     }
 }

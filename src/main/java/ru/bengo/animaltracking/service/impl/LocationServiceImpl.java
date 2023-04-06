@@ -30,12 +30,12 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
-    public void deleteLocation(@NotNull @Positive Long id) {
-        locationRepository.deleteById(id);
+    public Long deleteLocation(@NotNull @Positive Long id) {
+        return locationRepository.deleteLocationById(id);
     }
 
     @Override
-    public Location changeLocation(@Valid Location location, @NotNull @Positive Long id) {
+    public Location updateLocation(@Valid Location location, @NotNull @Positive Long id) {
         Optional<Location> foundLocation = locationRepository.findById(id);
 
         if (foundLocation.isPresent()) {

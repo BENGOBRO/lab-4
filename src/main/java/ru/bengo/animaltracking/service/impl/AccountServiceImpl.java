@@ -5,13 +5,17 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import ru.bengo.animaltracking.exception.NoAccessException;
 import ru.bengo.animaltracking.exception.UserAlreadyExistException;
 import ru.bengo.animaltracking.model.Account;
 import ru.bengo.animaltracking.model.Message;
@@ -38,14 +42,13 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     }
 
     @Override
-    public Optional<List<Account>> search(String firstName, String lastName, String email,
+    public List<Account> search(String firstName, String lastName, String email,
                                            @Min(0) Integer from, @Min(1) Integer size) {
-        return Optional.empty();
-    }
+        PageRequest pageRequest = PageRequest.of(from, size);
 
-    @Override
-    public Account save(Account account) {
-        return accountRepository.save(account);
+        Page<Account> page =
+                accountRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrderById(firstName, lastName, email, pageRequest);
+        return page.getContent();
     }
 
     @Override
@@ -61,21 +64,28 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     }
 
     @Override
-    public Account update(Account account) throws UserAlreadyExistException {
+    public Account update(@Valid Account account,@NotNull @Positive Integer id) throws UserAlreadyExistException, NoAccessException {
         String email = account.getEmail();
 
         if (isEmailExist(email)) {
             throw new UserAlreadyExistException(Message.ACCOUNT_EXIST.getInfo());
         }
 
+        if (!isUserUpdatingTheirAccount(email)) {
+            throw new NoAccessException(Message.NO_ACCESS.getInfo());
+        }
         return accountRepository.save(account);
     }
 
-    private boolean isEmailExist(String email) {
+    @Override
+    public Long delete(@NotNull @Positive Integer id) throws NoAccessException {
+        Optional<Account> foundAccount = findById(id);
+        String email = foundAccount.get().getEmail();
 
-        Optional<Account> foundAccount = accountRepository.findAccountByEmail(email);
-        return foundAccount.isPresent();
-
+        if (!isUserUpdatingTheirAccount(email)) {
+            throw new NoAccessException(Message.NO_ACCESS.getInfo());
+        }
+        return accountRepository.deleteAccountById(id);
     }
 
     @Override
@@ -87,5 +97,19 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         }
 
         throw new UsernameNotFoundException(username);
+    }
+
+    private boolean isEmailExist(String email) {
+
+        Optional<Account> foundAccount = accountRepository.findAccountByEmail(email);
+        return foundAccount.isPresent();
+
+    }
+
+    private boolean isUserUpdatingTheirAccount(String email) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth.getName().equals(email);
+
     }
 }

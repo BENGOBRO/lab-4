@@ -4,7 +4,8 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum Message {
-    ACCOUNT_EXIST("There is an account with that email address");
+    ACCOUNT_EXIST("There is an account with that email address"),
+    NO_ACCESS("No rights to access");
 
     private final String info;
 

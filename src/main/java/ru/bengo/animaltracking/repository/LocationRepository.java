@@ -6,4 +6,7 @@ import ru.bengo.animaltracking.model.Location;
 import java.util.Optional;
 
 public interface LocationRepository extends CrudRepository<Location, Long> {
+
+    Long deleteLocationById(Long id);
+
 }

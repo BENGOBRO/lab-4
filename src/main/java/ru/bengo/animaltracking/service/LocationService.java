@@ -11,6 +11,6 @@ public interface LocationService {
 
     Optional<Location> getLocation(@NotNull @Positive Long id);
     Location addLocation(@Valid Location location);
-    void deleteLocation(@NotNull @Positive Long id);
-    Location changeLocation(@Valid Location location, @NotNull @Positive Long id);
+    Long deleteLocation(@NotNull @Positive Long id);
+    Location updateLocation(@Valid Location location, @NotNull @Positive Long id);
 }
