@@ -3,6 +3,7 @@ package ru.bengo.animaltracking.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.bengo.animaltracking.exception.LocationAlreadyExistException;
 import ru.bengo.animaltracking.model.Location;
 import ru.bengo.animaltracking.service.LocationService;
 
@@ -27,13 +28,13 @@ public class LocationController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addLocation(@RequestBody Location location) {
+    public ResponseEntity<?> addLocation(@RequestBody Location location) throws LocationAlreadyExistException {
         return ResponseEntity.ok(locationService.addLocation(location));
     }
 
     @PutMapping("/{pointId}")
     public ResponseEntity<?> updateLocation(@RequestBody Location location,
-                                            @PathVariable("pointId") Long id) {
+                                            @PathVariable("pointId") Long id) throws LocationAlreadyExistException {
         Location changedLocation = locationService.updateLocation(location, id);
 
         if (changedLocation != null) {

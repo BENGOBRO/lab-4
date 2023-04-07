@@ -74,6 +74,8 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         if (!isUserUpdatingTheirAccount(email)) {
             throw new NoAccessException(Message.NO_ACCESS.getInfo());
         }
+
+        account.setId(id);
         return accountRepository.save(account);
     }
 

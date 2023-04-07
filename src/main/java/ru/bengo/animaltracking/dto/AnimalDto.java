@@ -1,5 +1,6 @@
 package ru.bengo.animaltracking.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
@@ -13,6 +14,6 @@ public class AnimalDto {
     private Float height;
     private String gender;
     private Integer chipperId;
-    private Long ChipperLocationId;
+    private Long ChippingLocationId;
 
 }
