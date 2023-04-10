@@ -4,11 +4,10 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import org.springframework.security.core.parameters.P;
 import ru.bengo.animaltracking.dto.AnimalDto;
-import ru.bengo.animaltracking.exception.AnimalTypeNotFoundException;
-import ru.bengo.animaltracking.exception.AnimalTypesHasDuplicatesException;
-import ru.bengo.animaltracking.exception.ChipperIdNotFoundException;
-import ru.bengo.animaltracking.exception.ChippingLocationIdNotFound;
+import ru.bengo.animaltracking.dto.TypeDto;
+import ru.bengo.animaltracking.exception.*;
 import ru.bengo.animaltracking.model.Animal;
 
 import java.time.LocalDateTime;
@@ -24,5 +23,14 @@ public interface AnimalService {
                                   @Min(0) Integer from, @Min(1) Integer size);
     Animal add(@Valid AnimalDto animalDto) throws AnimalTypesHasDuplicatesException, AnimalTypeNotFoundException, ChipperIdNotFoundException, ChippingLocationIdNotFound;
 
-    Animal update(@NotNull @Positive Long id, @Valid Animal animal);
+    Animal update(@NotNull @Positive Long id, @Valid AnimalDto animal) throws AnimalNotFoundException,
+            UpdateDeadToAliveException, ChipperIdNotFoundException, ChippingLocationIdNotFound,
+            NewChippingLocationIdEqualsFirstVisitedLocationIdException;
+
+    void delete(@NotNull @Positive Long id) throws AnimalNotFoundException;
+
+    Animal addAnimalTypeToAnimal(@NotNull @Positive Long animalId, @NotNull @Positive Long typeId) throws AnimalNotFoundException,
+            AnimalTypeNotFoundException, AnimalTypesContainNewAnimalTypeException;
+
+    Animal updateAnimalTypesInAnimal(@NotNull @Positive Long animalId, @Valid TypeDto typeDto) throws AnimalNotFoundException, AnimalTypeNotFoundException, AnimalDoesNotHaveTypeException, AnimalTypeAlreadyExist;
 }

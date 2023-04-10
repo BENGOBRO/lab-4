@@ -1,15 +1,18 @@
 package ru.bengo.animaltracking.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import ru.bengo.animaltracking.dto.AnimalDto;
-import ru.bengo.animaltracking.exception.AnimalTypeNotFoundException;
-import ru.bengo.animaltracking.exception.AnimalTypesHasDuplicatesException;
-import ru.bengo.animaltracking.exception.ChipperIdNotFoundException;
-import ru.bengo.animaltracking.exception.ChippingLocationIdNotFound;
+import ru.bengo.animaltracking.dto.TypeDto;
+import ru.bengo.animaltracking.dto.TypeUpdateDto;
+import ru.bengo.animaltracking.exception.*;
 import ru.bengo.animaltracking.model.Animal;
+import ru.bengo.animaltracking.model.Gender;
+import ru.bengo.animaltracking.model.LifeStatus;
 import ru.bengo.animaltracking.service.AnimalService;
 
 import java.time.LocalDateTime;
@@ -47,12 +50,34 @@ public class AnimalController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addAnimal(@RequestBody AnimalDto animalDto) throws AnimalTypesHasDuplicatesException, ChippingLocationIdNotFound, ChipperIdNotFoundException, AnimalTypeNotFoundException {
+    public ResponseEntity<?> addAnimal(@RequestBody AnimalDto animalDto) throws AnimalTypesHasDuplicatesException,
+            ChippingLocationIdNotFound, ChipperIdNotFoundException, AnimalTypeNotFoundException {
         return ResponseEntity.ok(animalService.add(animalDto));
     }
 
-    @PutMapping
-    public ResponseEntity<?> updateAnimal(@RequestBody AnimalDto animalDto) {
+    @PutMapping("/{animalId}")
+    public ResponseEntity<?> updateAnimal(@PathVariable("animalId") Long id, @RequestBody AnimalDto animalDto) throws AnimalNotFoundException,
+            NewChippingLocationIdEqualsFirstVisitedLocationIdException, UpdateDeadToAliveException, ChippingLocationIdNotFound,
+            ChipperIdNotFoundException {
+        return ResponseEntity.ok(animalService.update(id, animalDto));
+    }
+
+    @DeleteMapping("/{animalId}")
+    public ResponseEntity<?> deleteAnimal(@PathVariable("animalId") Long id) throws AnimalNotFoundException {
+        animalService.delete(id);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{animalId}/types/{typeId}")
+    public ResponseEntity<?> addAnimalTypeToAnimal(@PathVariable("animalId") Long animalId,
+                                                   @PathVariable("typeId") Long typeId) throws AnimalNotFoundException,
+            AnimalTypesContainNewAnimalTypeException, AnimalTypeNotFoundException {
+        return ResponseEntity.ok(animalService.addAnimalTypeToAnimal(animalId, typeId));
+    }
+
+    @PutMapping("/{animalId}/types")
+    public ResponseEntity<?> updateAnimalTypeInAnimal(@PathVariable("animalId") Long animalId,
+                                                      @RequestBody TypeDto typeDto) {
+        return ResponseEntity.ok(animalService.)
     }
 }

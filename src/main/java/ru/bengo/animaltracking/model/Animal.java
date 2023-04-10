@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
+import ru.bengo.animaltracking.annotation.GenderAnnotation;
+import ru.bengo.animaltracking.annotation.LifeStatusAnnotation;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,22 +23,15 @@ public class Animal {
     private Long id;
 
     @ManyToMany
-    private List<AnimalType> animalTypes;
+    private List<Long> animalTypes;
 
-    @NotNull
-    @Positive
     private Double weight;
 
-    @NotNull
-    @Positive
     private Double length;
 
-    @NotNull
-    @Positive
     private Double height;
 
     @Enumerated(EnumType.STRING)
-    @NotNull
     private Gender gender;
 
     @Enumerated(EnumType.STRING)
@@ -46,14 +41,12 @@ public class Animal {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime chippingDateTime;
 
-    @NotNull
-    @Positive
     private Integer chipperId;
 
     private Long chippingLocationId;
 
     @ManyToMany
-    private List<Location> visitedLocations;
+    private List<Long> visitedLocations;
 
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime deathDateTime;
