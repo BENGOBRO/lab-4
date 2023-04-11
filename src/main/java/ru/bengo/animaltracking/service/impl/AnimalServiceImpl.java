@@ -59,9 +59,9 @@ public class AnimalServiceImpl implements AnimalService {
     public Animal add(@Valid AnimalDto animalDto) throws AnimalTypesHasDuplicatesException,
             AnimalTypeNotFoundException, ChipperIdNotFoundException, ChippingLocationIdNotFound {
 
-        var animalTypes = animalDto.getAnimalTypes();
-        var chipperId = animalDto.getChipperId();
-        var chippingLocationId = animalDto.getChippingLocationId();
+        var animalTypes = animalDto.animalTypes();
+        var chipperId = animalDto.chipperId();
+        var chippingLocationId = animalDto.chippingLocationId();
 
         if (hasAnimalTypesDuplicates(animalTypes)) {
             throw new AnimalTypesHasDuplicatesException(Message.ANIMAL_TYPES_HAS_DUPLICATES.getInfo());
@@ -91,9 +91,9 @@ public class AnimalServiceImpl implements AnimalService {
         }
 
         var foundAnimal = foundOptionalAnimal.get();
-        var requestChipperId = animalDto.getChipperId();
-        var requestChippingLocationId = animalDto.getChippingLocationId();
-        var requestLifeStatusRequest = animalDto.getLifeStatus();
+        var requestChipperId = animalDto.chipperId();
+        var requestChippingLocationId = animalDto.chippingLocationId();
+        var requestLifeStatusRequest = animalDto.lifeStatus();
         var requestFirstVisitedLocationId = foundAnimal.getVisitedLocations().get(0);
 
         if (isDead(foundAnimal.getLifeStatus())) {
@@ -162,8 +162,8 @@ public class AnimalServiceImpl implements AnimalService {
             throw new AnimalNotFoundException(Message.ANIMAL_NOT_FOUND.getInfo());
         }
 
-        Long newTypeId = typeDto.getNewTypeId();
-        Long oldTypeId = typeDto.getOldTypeId();
+        Long newTypeId = typeDto.newTypeId();
+        Long oldTypeId = typeDto.oldTypeId();
         if (animalTypeService.get(newTypeId).isEmpty() || animalTypeService.get(oldTypeId).isEmpty()) {
             throw new AnimalTypeNotFoundException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo());
         }

@@ -39,5 +39,5 @@ public record AnimalDto (
 
         @NotNull
         @Positive
-        Long ChippingLocationId
+        Long chippingLocationId
 ) {}
