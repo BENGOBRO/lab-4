@@ -4,16 +4,17 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.bengo.animaltracking.dto.AnimalDto;
 import ru.bengo.animaltracking.dto.TypeDto;
 import ru.bengo.animaltracking.exception.*;
-import ru.bengo.animaltracking.model.*;
+import ru.bengo.animaltracking.model.Animal;
+import ru.bengo.animaltracking.model.LifeStatus;
+import ru.bengo.animaltracking.model.Message;
 import ru.bengo.animaltracking.repository.AnimalRepository;
 import ru.bengo.animaltracking.service.AccountService;
 import ru.bengo.animaltracking.service.AnimalService;
@@ -21,24 +22,20 @@ import ru.bengo.animaltracking.service.AnimalTypeService;
 import ru.bengo.animaltracking.service.LocationService;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @Validated
+@AllArgsConstructor(onConstructor = @__(@Autowired))
 public class AnimalServiceImpl implements AnimalService {
 
-    @Autowired
     private AnimalRepository animalRepository;
 
-    @Autowired
     private AnimalTypeService animalTypeService;
 
-    @Autowired
     private AccountService accountService;
 
-    @Autowired
     private LocationService locationService;
 
     @Override
@@ -62,9 +59,9 @@ public class AnimalServiceImpl implements AnimalService {
     public Animal add(@Valid AnimalDto animalDto) throws AnimalTypesHasDuplicatesException,
             AnimalTypeNotFoundException, ChipperIdNotFoundException, ChippingLocationIdNotFound {
 
-        List<Long> animalTypes = animalDto.getAnimalTypes();
-        Integer chipperId = animalDto.getChipperId();
-        Long chippingLocationId = animalDto.getChippingLocationId();
+        var animalTypes = animalDto.getAnimalTypes();
+        var chipperId = animalDto.getChipperId();
+        var chippingLocationId = animalDto.getChippingLocationId();
 
         if (hasAnimalTypesDuplicates(animalTypes)) {
             throw new AnimalTypesHasDuplicatesException(Message.ANIMAL_TYPES_HAS_DUPLICATES.getInfo());
@@ -88,16 +85,16 @@ public class AnimalServiceImpl implements AnimalService {
             UpdateDeadToAliveException, ChipperIdNotFoundException, ChippingLocationIdNotFound,
             NewChippingLocationIdEqualsFirstVisitedLocationIdException {
 
-        Optional<Animal> foundOptionalAnimal = animalRepository.findById(id);
+        var foundOptionalAnimal = animalRepository.findById(id);
         if (foundOptionalAnimal.isEmpty()) {
             throw new AnimalNotFoundException(Message.ANIMAL_NOT_FOUND.getInfo());
         }
 
-        Animal foundAnimal = foundOptionalAnimal.get();
-        Integer requestChipperId = animalDto.getChipperId();
-        Long requestChippingLocationId = animalDto.getChippingLocationId();
-        String requestLifeStatusRequest = animalDto.getLifeStatus();
-        Long requestFirstVisitedLocationId = foundAnimal.getVisitedLocations().get(0);
+        var foundAnimal = foundOptionalAnimal.get();
+        var requestChipperId = animalDto.getChipperId();
+        var requestChippingLocationId = animalDto.getChippingLocationId();
+        var requestLifeStatusRequest = animalDto.getLifeStatus();
+        var requestFirstVisitedLocationId = foundAnimal.getVisitedLocations().get(0);
 
         if (isDead(foundAnimal.getLifeStatus())) {
             if (requestLifeStatusRequest.equals(LifeStatus.ALIVE.name())) {
@@ -123,7 +120,7 @@ public class AnimalServiceImpl implements AnimalService {
     @Override
     public void delete(@NotNull @Positive Long id) throws AnimalNotFoundException {
 
-        Optional<Animal> foundOptionalAnimal = animalRepository.findById(id);
+        var foundOptionalAnimal = animalRepository.findById(id);
         if (foundOptionalAnimal.isEmpty()) {
             throw new AnimalNotFoundException(Message.ANIMAL_NOT_FOUND.getInfo());
         }
@@ -136,13 +133,13 @@ public class AnimalServiceImpl implements AnimalService {
                                         @NotNull @Positive Long typeId) throws AnimalNotFoundException,
             AnimalTypeNotFoundException, AnimalTypesContainNewAnimalTypeException {
 
-        Optional<Animal> foundOptionalAnimal = animalRepository.findById(animalId);
+        var foundOptionalAnimal = animalRepository.findById(animalId);
         if (foundOptionalAnimal.isEmpty()) {
             throw new AnimalNotFoundException(Message.ANIMAL_NOT_FOUND.getInfo());
         }
 
         Animal foundAnimal = foundOptionalAnimal.get();
-        List<Long> animalTypes = foundAnimal.getAnimalTypes();
+        var animalTypes = foundAnimal.getAnimalTypes();
         if (animalTypeService.get(typeId).isEmpty()) {
             throw new AnimalTypeNotFoundException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo());
         }
@@ -195,8 +192,8 @@ public class AnimalServiceImpl implements AnimalService {
     }
 
     private boolean isAnimalTypesExist(List<Long> animalTypes) {
-        for (Long id: animalTypes) {
-            Optional<AnimalType> foundAnimalType = animalTypeService.get(id);
+        for (var id: animalTypes) {
+            var foundAnimalType = animalTypeService.get(id);
             if (foundAnimalType.isEmpty()) {
                 return false;
             }
@@ -226,7 +223,7 @@ public class AnimalServiceImpl implements AnimalService {
     }
 
     private boolean isAnimalTypesContainNewAnimalTypeId(List<Long> animalTypes, Long newAnimalType) {
-        for (Long animalType: animalTypes) {
+        for (var animalType: animalTypes) {
             if (animalType.equals(newAnimalType)) {
                 return true;
             }

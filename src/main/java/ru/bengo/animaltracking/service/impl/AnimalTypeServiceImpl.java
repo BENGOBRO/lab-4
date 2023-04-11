@@ -3,6 +3,7 @@ package ru.bengo.animaltracking.service.impl;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -16,10 +17,10 @@ import java.util.Optional;
 
 @Service
 @Validated
+@RequiredArgsConstructor
 public class AnimalTypeServiceImpl implements AnimalTypeService {
 
-    @Autowired
-    private AnimalTypeRepository animalTypeRepository;
+    private final AnimalTypeRepository animalTypeRepository;
 
     @Override
     public Optional<AnimalType> get(@NotNull @Positive Long id) {

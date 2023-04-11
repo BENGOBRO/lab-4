@@ -1,18 +1,13 @@
 package ru.bengo.animaltracking.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import ru.bengo.animaltracking.dto.AnimalDto;
 import ru.bengo.animaltracking.dto.TypeDto;
-import ru.bengo.animaltracking.dto.TypeUpdateDto;
 import ru.bengo.animaltracking.exception.*;
 import ru.bengo.animaltracking.model.Animal;
-import ru.bengo.animaltracking.model.Gender;
-import ru.bengo.animaltracking.model.LifeStatus;
 import ru.bengo.animaltracking.service.AnimalService;
 
 import java.time.LocalDateTime;
@@ -77,7 +72,8 @@ public class AnimalController {
 
     @PutMapping("/{animalId}/types")
     public ResponseEntity<?> updateAnimalTypeInAnimal(@PathVariable("animalId") Long animalId,
-                                                      @RequestBody TypeDto typeDto) {
-        return ResponseEntity.ok(animalService.)
+                                                      @RequestBody TypeDto typeDto) throws AnimalNotFoundException,
+            AnimalTypeAlreadyExist, AnimalTypeNotFoundException, AnimalDoesNotHaveTypeException {
+        return ResponseEntity.ok(animalService.updateAnimalTypesInAnimal(animalId, typeDto));
     }
 }

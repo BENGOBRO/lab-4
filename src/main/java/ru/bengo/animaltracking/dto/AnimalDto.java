@@ -9,37 +9,35 @@ import ru.bengo.animaltracking.annotation.LifeStatusAnnotation;
 
 import java.util.List;
 
-@Data
-public class AnimalDto {
 
-    private List<Long> animalTypes;
+public record AnimalDto (
+        List<Long> animalTypes,
 
-    @NotNull
-    @Positive
-    private Float weight;
+        @NotNull
+        @Positive
+        Float weight,
 
-    @NotNull
-    @Positive
-    private Float length;
+        @NotNull
+        @Positive
+        Float length,
 
-    @NotNull
-    @Positive
-    private Float height;
+        @NotNull
+        @Positive
+        Float height,
 
-    @NotNull
-    @GenderAnnotation
-    private String gender;
+        @NotNull
+        @GenderAnnotation
+        String gender,
 
-    @NotNull
-    @LifeStatusAnnotation
-    private String lifeStatus;
+        @NotNull
+        @LifeStatusAnnotation
+        String lifeStatus,
 
-    @NotNull
-    @Positive
-    private Integer chipperId;
+        @NotNull
+        @Positive
+        Integer chipperId,
 
-    @NotNull
-    @Positive
-    private Long ChippingLocationId;
-
-}
+        @NotNull
+        @Positive
+        Long ChippingLocationId
+) {}

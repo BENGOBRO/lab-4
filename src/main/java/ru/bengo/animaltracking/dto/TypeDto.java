@@ -4,15 +4,12 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
-@Data
-public class TypeDto {
+public record TypeDto (
+        @NotNull
+        @Positive
+        Long oldTypeId,
 
-    @NotNull
-    @Positive
-    private Long oldTypeId;
-
-    @NotNull
-    @Positive
-    private Long newTypeId;
-
-}
+        @NotNull
+        @Positive
+        Long newTypeId
+) {}
