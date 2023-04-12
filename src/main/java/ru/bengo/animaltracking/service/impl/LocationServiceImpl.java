@@ -4,9 +4,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import ru.bengo.animaltracking.dto.LocationDto;
 import ru.bengo.animaltracking.exception.LocationAlreadyExistException;
 import ru.bengo.animaltracking.model.Location;
 import ru.bengo.animaltracking.model.Message;
@@ -28,11 +28,11 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
-    public Location addLocation(@Valid Location location) throws LocationAlreadyExistException {
-        if (isLocationWithLatitudeAndLongitudeExist(location.getLatitude(), location.getLongitude())) {
+    public Location addLocation(@Valid LocationDto locationDto) throws LocationAlreadyExistException {
+        if (isLocationWithLatitudeAndLongitudeExist(locationDto.latitude(), locationDto.longitude())) {
             throw new LocationAlreadyExistException(Message.LOCATION_EXIST.getInfo());
         }
-        return locationRepository.save(location);
+        return locationRepository.save(convertToEntity(locationDto));
     }
 
     @Override
@@ -41,13 +41,14 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
-    public Location updateLocation(@Valid Location location, @NotNull @Positive Long id) throws LocationAlreadyExistException {
+    public Location updateLocation(@Valid LocationDto locationDto, @NotNull @Positive Long id) throws LocationAlreadyExistException {
         Optional<Location> foundLocation = locationRepository.findById(id);
 
         if (foundLocation.isPresent()) {
-            if (isLocationWithLatitudeAndLongitudeExist(location.getLatitude(), location.getLongitude())) {
+            if (isLocationWithLatitudeAndLongitudeExist(locationDto.latitude(), locationDto.longitude())) {
                 throw new LocationAlreadyExistException(Message.LOCATION_EXIST.getInfo());
             }
+            Location location = convertToEntity(locationDto);
             location.setId(id);
             return locationRepository.save(location);
         }
@@ -57,5 +58,12 @@ public class LocationServiceImpl implements LocationService {
 
     private boolean isLocationWithLatitudeAndLongitudeExist(Double latitude, Double longitude) {
         return locationRepository.findByLatitudeAndLongitude(latitude, longitude).isPresent();
+    }
+
+    private Location convertToEntity(LocationDto locationDto) {
+        return Location.builder()
+                .latitude(locationDto.latitude())
+                .longitude(locationDto.longitude())
+                .build();
     }
 }

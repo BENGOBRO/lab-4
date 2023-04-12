@@ -3,6 +3,7 @@ package ru.bengo.animaltracking.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.bengo.animaltracking.dto.AccountDto;
 import ru.bengo.animaltracking.exception.NoAccessException;
 import ru.bengo.animaltracking.exception.UserAlreadyExistException;
 import ru.bengo.animaltracking.model.Account;
@@ -40,12 +41,12 @@ public class AccountController {
     }
 
     @PutMapping("/{accountId}")
-    public ResponseEntity<?> updateAccount(@RequestBody Account account,
+    public ResponseEntity<?> updateAccount(@RequestBody AccountDto accountDto,
                                                @PathVariable("accountId") Integer id) throws UserAlreadyExistException, NoAccessException {
-        Account updatedAccount = accountService.update(account, id);
+        Account updatedAccount = accountService.update(accountDto, id);
 
         if (updatedAccount != null) {
-            return ResponseEntity.ok(account);
+            return ResponseEntity.ok(accountDto);
         }
 
         return ResponseEntity.notFound().build();

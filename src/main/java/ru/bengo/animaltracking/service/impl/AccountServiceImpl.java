@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
+import ru.bengo.animaltracking.dto.AccountDto;
 import ru.bengo.animaltracking.exception.NoAccessException;
 import ru.bengo.animaltracking.exception.UserAlreadyExistException;
 import ru.bengo.animaltracking.model.Account;
@@ -24,8 +25,7 @@ import ru.bengo.animaltracking.model.User;
 import ru.bengo.animaltracking.repository.AccountRepository;
 import ru.bengo.animaltracking.service.AccountService;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Validated
@@ -43,29 +43,31 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
     @Override
     public List<Account> search(String firstName, String lastName, String email,
-                                           @Min(0) Integer from, @Min(1) Integer size) {
-        PageRequest pageRequest = PageRequest.of(from, size);
+                                @Min(0) Integer from, @Min(1) Integer size) {
+        PageRequest pageRequest = PageRequest.ofSize(size);
 
         Page<Account> page =
                 accountRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrderById(firstName, lastName, email, pageRequest);
-        return page.getContent();
+
+        return page.stream().skip(from).toList();
     }
 
     @Override
-    public Account register(@Valid Account account) throws UserAlreadyExistException{
-        String email = account.getEmail();
+    public Account register(@Valid AccountDto accountDto) throws UserAlreadyExistException{
+        String email = accountDto.email();
 
         if (isEmailExist(email)) {
             throw new UserAlreadyExistException(Message.ACCOUNT_EXIST.getInfo());
         }
 
+        Account account = convertToEntity(accountDto);
         account.setPassword(passwordEncoder.encode(account.getPassword()));
         return accountRepository.save(account);
     }
 
     @Override
-    public Account update(@Valid Account account,@NotNull @Positive Integer id) throws UserAlreadyExistException, NoAccessException {
-        String email = account.getEmail();
+    public Account update(@Valid AccountDto accountDto,@NotNull @Positive Integer id) throws UserAlreadyExistException, NoAccessException {
+        String email = accountDto.email();
 
         if (isEmailExist(email)) {
             throw new UserAlreadyExistException(Message.ACCOUNT_EXIST.getInfo());
@@ -75,6 +77,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
             throw new NoAccessException(Message.NO_ACCESS.getInfo());
         }
 
+        Account account = convertToEntity(accountDto);
         account.setId(id);
         return accountRepository.save(account);
     }
@@ -113,5 +116,14 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return auth.getName().equals(email);
 
+    }
+
+    private Account convertToEntity(AccountDto accountDto) {
+        return Account.builder()
+                .firstName(accountDto.firstName())
+                .lastName(accountDto.lastName())
+                .email(accountDto.email())
+                .password(accountDto.password())
+                .build();
     }
 }

@@ -94,7 +94,7 @@ public class AnimalServiceImpl implements AnimalService {
         var requestChipperId = animalDto.chipperId();
         var requestChippingLocationId = animalDto.chippingLocationId();
         var requestLifeStatusRequest = animalDto.lifeStatus();
-        var requestFirstVisitedLocationId = foundAnimal.getVisitedLocations().get(0);
+        var requestFirstVisitedLocationId = foundAnimal.getVisitedLocationsJson().get(0);
 
         if (isDead(foundAnimal.getLifeStatus())) {
             if (requestLifeStatusRequest.equals(LifeStatus.ALIVE.name())) {
@@ -139,16 +139,16 @@ public class AnimalServiceImpl implements AnimalService {
         }
 
         Animal foundAnimal = foundOptionalAnimal.get();
-        var animalTypes = foundAnimal.getAnimalTypes();
+        var animalTypes = foundAnimal.getAnimalTypesJson();
         if (animalTypeService.get(typeId).isEmpty()) {
             throw new AnimalTypeNotFoundException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo());
         }
-        if (isAnimalTypesContainNewAnimalTypeId(foundAnimal.getAnimalTypes(), typeId)) {
+        if (isAnimalTypesContainNewAnimalTypeId(foundAnimal.getAnimalTypesJson(), typeId)) {
             throw new AnimalTypesContainNewAnimalTypeException(Message.ANIMAL_TYPES_CONTAIN_NEW_ANIMAL_TYPE.getInfo());
         }
 
         animalTypes.add(animalTypeService.get(typeId).get().getId());
-        foundAnimal.setAnimalTypes(animalTypes);
+        // foundAnimal.setAnimalTypes(animalTypes);
         return animalRepository.save(foundAnimal);
     }
 
@@ -178,7 +178,7 @@ public class AnimalServiceImpl implements AnimalService {
         }
 
         Animal foundAnimal = foundOptionalAnimal.get();
-        List<Long> animalTypes = foundAnimal.getAnimalTypes();
+        List<Long> animalTypes = foundAnimal.getAnimalTypesJson();
 //        animalTypes.;
 //        animalTypes.add(newTypeId)
         return null;

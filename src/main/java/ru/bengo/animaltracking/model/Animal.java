@@ -1,14 +1,10 @@
 package ru.bengo.animaltracking.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.Data;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
-import ru.bengo.animaltracking.annotation.GenderAnnotation;
-import ru.bengo.animaltracking.annotation.LifeStatusAnnotation;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,7 +19,12 @@ public class Animal {
     private Long id;
 
     @ManyToMany
-    private List<Long> animalTypes;
+    @JsonIgnore
+    private List<AnimalType> animalTypes;
+
+    @Transient
+    @JsonProperty("animalTypes")
+    private List<Long> animalTypesJson;
 
     private Double weight;
 
@@ -46,7 +47,12 @@ public class Animal {
     private Long chippingLocationId;
 
     @ManyToMany
-    private List<Long> visitedLocations;
+    @JsonIgnore
+    private List<Location> visitedLocations;
+
+    @Transient
+    @JsonProperty("visitedLocations")
+    private List<Long> visitedLocationsJson;
 
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime deathDateTime;
