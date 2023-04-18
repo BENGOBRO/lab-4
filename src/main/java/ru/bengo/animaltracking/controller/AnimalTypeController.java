@@ -18,23 +18,20 @@ public class AnimalTypeController {
     private final AnimalTypeService animalTypeService;
 
     @GetMapping("/{typeId}")
-    public ResponseEntity<?> getAnimalType(@PathVariable("typeId") Long id) {
+    public ResponseEntity<AnimalType> getAnimalType(@PathVariable("typeId") Long id) {
         Optional<AnimalType> foundAnimalType = animalTypeService.get(id);
 
-        if (foundAnimalType.isPresent()) {
-            return ResponseEntity.ok(foundAnimalType.get());
-        }
+        return foundAnimalType.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
 
-        return ResponseEntity.notFound().build();
     }
 
     @PostMapping
-    public ResponseEntity<?> addAnimalType(@RequestBody AnimalType animalType) throws AnimalTypeAlreadyExist {
+    public ResponseEntity<AnimalType> addAnimalType(@RequestBody AnimalType animalType) throws AnimalTypeAlreadyExist {
         return ResponseEntity.status(HttpStatus.CREATED).body(animalTypeService.add(animalType));
     }
 
     @PutMapping("/{typeId}")
-    public ResponseEntity<?> updateAnimalType(@PathVariable("typeId") Long id, @RequestBody AnimalType animalType) throws AnimalTypeAlreadyExist {
+    public ResponseEntity<AnimalType> updateAnimalType(@PathVariable("typeId") Long id, @RequestBody AnimalType animalType) throws AnimalTypeAlreadyExist {
         AnimalType updatedAnimalType = animalTypeService.update(id, animalType);
 
         if (updatedAnimalType == null) {

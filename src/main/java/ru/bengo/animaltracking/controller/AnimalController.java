@@ -12,6 +12,7 @@ import ru.bengo.animaltracking.model.Animal;
 import ru.bengo.animaltracking.service.AnimalService;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -22,37 +23,34 @@ public class AnimalController {
     private final AnimalService animalService;
 
     @GetMapping("/{animalId}")
-    public ResponseEntity<?> getAnimal(@PathVariable(value = "animalId") Long id) {
+    public ResponseEntity<Animal> getAnimal(@PathVariable(value = "animalId") Long id) {
         Optional<Animal> foundAnimal = animalService.findById(id);
 
-        if (foundAnimal.isPresent()) {
-            return ResponseEntity.ok(foundAnimal.get());
-        }
+        return foundAnimal.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
 
-        return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchAnimals(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
-                                           @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime,
-                                           @RequestParam(required = false) Integer chipperId,
-                                           @RequestParam(required = false) Long chippingLocationId,
-                                           @RequestParam(required = false) String lifeStatus,
-                                           @RequestParam(required = false) String gender,
-                                           @RequestParam(defaultValue = "0") Integer from,
-                                           @RequestParam(defaultValue = "10") Integer size) {
+    public ResponseEntity<List<Animal>> searchAnimals(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
+                                                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime,
+                                                      @RequestParam(required = false) Integer chipperId,
+                                                      @RequestParam(required = false) Long chippingLocationId,
+                                                      @RequestParam(required = false) String lifeStatus,
+                                                      @RequestParam(required = false) String gender,
+                                                      @RequestParam(defaultValue = "0") Integer from,
+                                                      @RequestParam(defaultValue = "10") Integer size) {
         return ResponseEntity.ok(animalService.search(startDateTime, endDateTime, chipperId,
                 chippingLocationId, lifeStatus, gender, from, size));
     }
 
     @PostMapping
-    public ResponseEntity<?> addAnimal(@RequestBody AnimalDto animalDto) throws AnimalTypesHasDuplicatesException,
+    public ResponseEntity<Animal> addAnimal(@RequestBody AnimalDto animalDto) throws AnimalTypesHasDuplicatesException,
             ChippingLocationIdNotFound, ChipperIdNotFoundException, AnimalTypeNotFoundException {
         return ResponseEntity.status(HttpStatus.CREATED).body(animalService.add(animalDto));
     }
 
     @PutMapping("/{animalId}")
-    public ResponseEntity<?> updateAnimal(@PathVariable("animalId") Long id, @RequestBody AnimalDto animalDto) throws AnimalNotFoundException,
+    public ResponseEntity<Animal> updateAnimal(@PathVariable("animalId") Long id, @RequestBody AnimalDto animalDto) throws AnimalNotFoundException,
             NewChippingLocationIdEqualsFirstVisitedLocationIdException, UpdateDeadToAliveException, ChippingLocationIdNotFound,
             ChipperIdNotFoundException {
         return ResponseEntity.ok(animalService.update(id, animalDto));
@@ -65,14 +63,14 @@ public class AnimalController {
     }
 
     @PostMapping("/{animalId}/types/{typeId}")
-    public ResponseEntity<?> addAnimalTypeToAnimal(@PathVariable("animalId") Long animalId,
+    public ResponseEntity<Animal> addAnimalTypeToAnimal(@PathVariable("animalId") Long animalId,
                                                    @PathVariable("typeId") Long typeId) throws AnimalNotFoundException,
             AnimalTypesContainNewAnimalTypeException, AnimalTypeNotFoundException {
         return ResponseEntity.ok(animalService.addAnimalTypeToAnimal(animalId, typeId));
     }
 
     @PutMapping("/{animalId}/types")
-    public ResponseEntity<?> updateAnimalTypeInAnimal(@PathVariable("animalId") Long animalId,
+    public ResponseEntity<Animal> updateAnimalTypeInAnimal(@PathVariable("animalId") Long animalId,
                                                       @RequestBody TypeDto typeDto) throws AnimalNotFoundException,
             AnimalTypeAlreadyExist, AnimalTypeNotFoundException, AnimalDoesNotHaveTypeException {
         return ResponseEntity.ok(animalService.updateAnimalTypesInAnimal(animalId, typeDto));

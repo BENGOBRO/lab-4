@@ -18,7 +18,7 @@ public class AuthController {
     private final AccountService accountService;
 
     @PostMapping("/registration")
-    public ResponseEntity<?> registration(@RequestBody AccountDto accountDto) throws UserAlreadyExistException {
+    public ResponseEntity<Account> registration(@RequestBody AccountDto accountDto) throws UserAlreadyExistException {
         return ResponseEntity.status(HttpStatus.CREATED).body(accountService.register(accountDto));
     }
 }

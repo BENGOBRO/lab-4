@@ -9,6 +9,7 @@ import ru.bengo.animaltracking.exception.UserAlreadyExistException;
 import ru.bengo.animaltracking.model.Account;
 import ru.bengo.animaltracking.service.AccountService;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -19,18 +20,15 @@ public class AccountController {
     private final AccountService accountService;
 
     @GetMapping("/{accountId}")
-    public ResponseEntity<?> getAccount(@PathVariable("accountId") Integer id) {
+    public ResponseEntity<Account> getAccount(@PathVariable("accountId") Integer id) {
         Optional<Account> foundAccount = accountService.findById(id);
 
-        if (foundAccount.isPresent()) {
-            return ResponseEntity.ok(foundAccount.get());
-        }
+        return foundAccount.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
 
-        return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchAccounts(
+    public ResponseEntity<List<Account>> searchAccounts(
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) String email,
@@ -41,12 +39,12 @@ public class AccountController {
     }
 
     @PutMapping("/{accountId}")
-    public ResponseEntity<?> updateAccount(@RequestBody AccountDto accountDto,
+    public ResponseEntity<Account> updateAccount(@RequestBody AccountDto accountDto,
                                                @PathVariable("accountId") Integer id) throws UserAlreadyExistException, NoAccessException {
         Account updatedAccount = accountService.update(accountDto, id);
 
         if (updatedAccount != null) {
-            return ResponseEntity.ok(accountDto);
+            return ResponseEntity.ok(updatedAccount);
         }
 
         return ResponseEntity.notFound().build();
