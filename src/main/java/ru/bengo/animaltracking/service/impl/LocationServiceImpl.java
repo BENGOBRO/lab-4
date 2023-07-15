@@ -27,7 +27,16 @@ public class LocationServiceImpl implements LocationService {
     private final static Logger log = LoggerFactory.getLogger(LocationServiceImpl.class);
 
     @Override
-    public Location getLocation(@NotNull @Positive Long id) throws LocationNotFoundException {
+    public Location create(@Valid LocationDto locationDto) throws LocationAlreadyExistException {
+        if (isLocationWithLatitudeAndLongitudeExist(locationDto.latitude(), locationDto.longitude())) {
+            throw new LocationAlreadyExistException(Message.LOCATION_EXIST.getInfo());
+        }
+
+        return locationRepository.save(convertToEntity(locationDto));
+    }
+
+    @Override
+    public Location get(@NotNull @Positive Long id) throws LocationNotFoundException {
         Optional<Location> foundLocation = locationRepository.findById(id);
 
         if (foundLocation.isEmpty()) {
@@ -38,15 +47,23 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
-    public Location addLocation(@Valid LocationDto locationDto) throws LocationAlreadyExistException {
+    public Location update(@Valid LocationDto locationDto, @NotNull @Positive Long id) throws LocationAlreadyExistException, LocationNotFoundException {
+        Optional<Location> foundLocation = locationRepository.findById(id);
+
+        if (foundLocation.isEmpty()) {
+            throw new LocationNotFoundException(Message.LOCATION_NOT_FOUND.getInfo());
+        }
         if (isLocationWithLatitudeAndLongitudeExist(locationDto.latitude(), locationDto.longitude())) {
             throw new LocationAlreadyExistException(Message.LOCATION_EXIST.getInfo());
         }
-        return locationRepository.save(convertToEntity(locationDto));
+
+        Location location = convertToEntity(locationDto);
+        location.setId(id);
+        return locationRepository.save(location);
     }
 
     @Override
-    public void deleteLocation(@NotNull @Positive Long id) throws LocationNotFoundException {
+    public void delete(@NotNull @Positive Long id) throws LocationNotFoundException {
         Optional<Location> foundLocation = locationRepository.findById(id);
         log.warn("HERE");
 
@@ -55,22 +72,6 @@ public class LocationServiceImpl implements LocationService {
         }
 
         locationRepository.deleteById(id);
-    }
-
-    @Override
-    public Location updateLocation(@Valid LocationDto locationDto, @NotNull @Positive Long id) throws LocationAlreadyExistException {
-        Optional<Location> foundLocation = locationRepository.findById(id);
-
-        if (foundLocation.isPresent()) {
-            if (isLocationWithLatitudeAndLongitudeExist(locationDto.latitude(), locationDto.longitude())) {
-                throw new LocationAlreadyExistException(Message.LOCATION_EXIST.getInfo());
-            }
-            Location location = convertToEntity(locationDto);
-            location.setId(id);
-            return locationRepository.save(location);
-        }
-
-        return null;
     }
 
     private boolean isLocationWithLatitudeAndLongitudeExist(Double latitude, Double longitude) {

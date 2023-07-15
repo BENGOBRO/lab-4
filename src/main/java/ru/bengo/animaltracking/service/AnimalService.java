@@ -15,19 +15,22 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AnimalService {
+    Animal create(@Valid AnimalDto animalDto)
+            throws AnimalTypesHasDuplicatesException, AnimalTypeNotFoundException,
+            ChipperIdNotFoundException, ChippingLocationIdNotFound;
 
-    Optional<Animal> findById(@NotNull @Positive Long id);
-    List<Animal> search(LocalDateTime startDateTime, LocalDateTime endDateTime,
-                                  @Positive Integer chipperId, @Positive Long chippingLocationId,
-                                  String lifeStatus, String gender,
-                                  @Min(0) Integer from, @Min(1) Integer size);
-    Animal create(@Valid AnimalDto animalDto) throws AnimalTypesHasDuplicatesException, AnimalTypeNotFoundException, ChipperIdNotFoundException, ChippingLocationIdNotFound;
+    Optional<Animal> get(@NotNull @Positive Long id);
 
     Animal update(@NotNull @Positive Long id, @Valid AnimalDto animal) throws AnimalNotFoundException,
             UpdateDeadToAliveException, ChipperIdNotFoundException, ChippingLocationIdNotFound,
             NewChippingLocationIdEqualsFirstVisitedLocationIdException;
 
     void delete(@NotNull @Positive Long id) throws AnimalNotFoundException;
+
+    List<Animal> search(LocalDateTime startDateTime, LocalDateTime endDateTime,
+                        @Positive Integer chipperId, @Positive Long chippingLocationId,
+                        String lifeStatus, String gender,
+                        @Min(0) Integer from, @Min(1) Integer size);
 
     Animal addAnimalTypeToAnimal(@NotNull @Positive Long animalId, @NotNull @Positive Long typeId) throws AnimalNotFoundException,
             AnimalTypeNotFoundException, AnimalTypesContainNewAnimalTypeException;

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AccountService {
-    Optional<Account> findById(@NotNull @Positive Integer id);
+    Optional<Account> get(@NotNull @Positive Integer id);
     List<Account> search(String firstName, String lastName, String email,
                          @Min(0) Integer from, @Min(1) Integer size);
 

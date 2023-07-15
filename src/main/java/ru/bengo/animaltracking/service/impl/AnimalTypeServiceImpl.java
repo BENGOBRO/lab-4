@@ -26,18 +26,18 @@ public class AnimalTypeServiceImpl implements AnimalTypeService {
     private static final Logger log = LoggerFactory.getLogger(AnimalTypeServiceImpl.class);
 
     @Override
-    public Optional<AnimalType> get(@NotNull @Positive Long id) {
-        return animalTypeRepository.findById(id);
-    }
-
-    @Override
-    public AnimalType add(@Valid AnimalType animalType) throws AnimalTypeAlreadyExist {
+    public AnimalType create(@Valid AnimalType animalType) throws AnimalTypeAlreadyExist {
         log.warn(">> Type here");
         if (isAnimalTypeWithTypeExist(animalType.getType())) {
             throw new AnimalTypeAlreadyExist(Message.ANIMAL_TYPE_EXIST.getInfo());
         }
         log.warn("I am here");
         return animalTypeRepository.save(animalType);
+    }
+
+    @Override
+    public Optional<AnimalType> get(@NotNull @Positive Long id) {
+        return animalTypeRepository.findById(id);
     }
 
     @Override
@@ -59,7 +59,6 @@ public class AnimalTypeServiceImpl implements AnimalTypeService {
     public void delete(@NotNull @Positive Long id) {
         animalTypeRepository.deleteById(id);
     }
-
 
     private boolean isAnimalTypeWithTypeExist(String type) {
         return animalTypeRepository.findByType(type).isPresent();

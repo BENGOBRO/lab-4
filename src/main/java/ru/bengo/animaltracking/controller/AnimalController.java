@@ -26,7 +26,7 @@ public class AnimalController {
     private static final Logger log = LoggerFactory.getLogger(AnimalController.class);
     @GetMapping("/{animalId}")
     public ResponseEntity<Animal> getAnimal(@PathVariable(value = "animalId") Long id) {
-        Optional<Animal> foundAnimal = animalService.findById(id);
+        Optional<Animal> foundAnimal = animalService.get(id);
 
         return foundAnimal.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
 

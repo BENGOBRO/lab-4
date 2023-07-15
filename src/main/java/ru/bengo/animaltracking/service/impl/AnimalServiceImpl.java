@@ -48,24 +48,6 @@ public class AnimalServiceImpl implements AnimalService {
     private static final Logger log = LoggerFactory.getLogger(AnimalServiceImpl.class);
 
     @Override
-    public Optional<Animal> findById(@NotNull @Positive Long id) {
-        return animalRepository.findById(id);
-    }
-
-    @Override
-    public List<Animal> search(LocalDateTime startDateTime, LocalDateTime endDateTime,
-                               @Positive Integer chipperId, @Positive Long chippingLocationId,
-                               String lifeStatus, String gender,
-                               @Min(0) Integer from, @Min(1) Integer size) {
-
-        PageRequest pageRequest = PageRequest.of(from, size);
-
-        Page<Animal> page = animalRepository.search(startDateTime, endDateTime, chipperId,
-                        chippingLocationId, lifeStatus, gender, pageRequest);
-        return page.getContent();
-    }
-
-    @Override
     public Animal create(@Valid AnimalDto animalDto) throws AnimalTypesHasDuplicatesException,
             AnimalTypeNotFoundException, ChipperIdNotFoundException, ChippingLocationIdNotFound {
 
@@ -91,6 +73,12 @@ public class AnimalServiceImpl implements AnimalService {
         Animal animal = convertToEntity(animalDto);
         return animalRepository.save(animal);
     }
+
+    @Override
+    public Optional<Animal> get(@NotNull @Positive Long id) {
+        return animalRepository.findById(id);
+    }
+
 
     @Override
     public Animal update(@NotNull @Positive Long id, @Valid AnimalDto animalDto) throws AnimalNotFoundException,
@@ -138,6 +126,19 @@ public class AnimalServiceImpl implements AnimalService {
         }
 
         animalRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Animal> search(LocalDateTime startDateTime, LocalDateTime endDateTime,
+                               @Positive Integer chipperId, @Positive Long chippingLocationId,
+                               String lifeStatus, String gender,
+                               @Min(0) Integer from, @Min(1) Integer size) {
+
+        PageRequest pageRequest = PageRequest.of(from, size);
+
+        Page<Animal> page = animalRepository.search(startDateTime, endDateTime, chipperId,
+                chippingLocationId, lifeStatus, gender, pageRequest);
+        return page.getContent();
     }
 
     @Override
@@ -226,7 +227,7 @@ public class AnimalServiceImpl implements AnimalService {
     }
 
     private boolean isChipperIdExist(Integer id) {
-        return accountService.findById(id).isPresent();
+        return accountService.get(id).isPresent();
     }
 
     private boolean isChippingLocationExist(Long id) {

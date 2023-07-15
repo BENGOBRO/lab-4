@@ -42,22 +42,6 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     private static final Logger log = LoggerFactory.getLogger(AccountServiceImpl.class);
 
     @Override
-    public Optional<Account> findById(@NotNull @Positive Integer id) {
-        return accountRepository.findById(id);
-    }
-
-    @Override
-    public List<Account> search(String firstName, String lastName, String email,
-                                @Min(0) Integer from, @Min(1) Integer size) {
-        PageRequest pageRequest = PageRequest.ofSize(size + from);
-
-        Page<Account> page =
-                accountRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrderById(firstName, lastName, email, pageRequest);
-
-        return page.stream().skip(from).toList();
-    }
-
-    @Override
     public Account register(@Valid AccountDto accountDto) throws UserAlreadyExistException{
         String email = accountDto.email();
 
@@ -71,9 +55,15 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     }
 
     @Override
+    public Optional<Account> get(@NotNull @Positive Integer id) {
+        return accountRepository.findById(id);
+    }
+
+
+    @Override
     public Account update(@Valid AccountDto accountDto,@NotNull @Positive Integer id) throws UserAlreadyExistException, NoAccessException, AccountNotFoundException {
         String email = accountDto.email();
-        Optional<Account> foundAccount = findById(id);
+        Optional<Account> foundAccount = get(id);
 
         if (foundAccount.isEmpty()) {
             throw new AccountNotFoundException(Message.ACCOUNT_NOT_FOUND.getInfo());
@@ -93,7 +83,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
     @Override
     public void delete(@NotNull @Positive Integer id) throws NoAccessException, AccountNotFoundException {
-        Optional<Account> foundAccount = findById(id);
+        Optional<Account> foundAccount = get(id);
 
         if (foundAccount.isEmpty()) {
             throw new AccountNotFoundException(Message.ACCOUNT_NOT_FOUND.getInfo());
@@ -106,6 +96,17 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         }
 
         accountRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Account> search(String firstName, String lastName, String email,
+                                @Min(0) Integer from, @Min(1) Integer size) {
+        PageRequest pageRequest = PageRequest.ofSize(size + from);
+
+        Page<Account> page =
+                accountRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrderById(firstName, lastName, email, pageRequest);
+
+        return page.stream().skip(from).toList();
     }
 
     @Override
@@ -138,7 +139,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     }
 
     private boolean isUserUpdatingTheirAccount(Integer id) {
-        Optional<Account> foundAccount = findById(id);
+        Optional<Account> foundAccount = get(id);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (foundAccount.isPresent()) {

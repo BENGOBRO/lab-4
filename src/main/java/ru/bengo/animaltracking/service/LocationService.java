@@ -11,9 +11,8 @@ import ru.bengo.animaltracking.model.Location;
 import java.util.Optional;
 
 public interface LocationService {
-
-    Location getLocation(@NotNull @Positive Long id) throws LocationNotFoundException;
-    Location addLocation(@Valid LocationDto locationDto) throws LocationAlreadyExistException;
-    void deleteLocation(@NotNull @Positive Long id) throws LocationNotFoundException;
-    Location updateLocation(@Valid LocationDto locationDto, @NotNull @Positive Long id) throws LocationAlreadyExistException;
+    Location create(@Valid LocationDto locationDto) throws LocationAlreadyExistException;
+    Location get(@NotNull @Positive Long id) throws LocationNotFoundException;
+    Location update(@Valid LocationDto locationDto, @NotNull @Positive Long id) throws LocationAlreadyExistException, LocationNotFoundException;
+    void delete(@NotNull @Positive Long id) throws LocationNotFoundException;
 }

@@ -31,7 +31,7 @@ public class AnimalTypeController {
     @PostMapping
     public ResponseEntity<AnimalType> addAnimalType(@RequestBody AnimalType animalType) throws AnimalTypeAlreadyExist {
         log.warn(">>Type controller");
-        return ResponseEntity.status(HttpStatus.CREATED).body(animalTypeService.add(animalType));
+        return ResponseEntity.status(HttpStatus.CREATED).body(animalTypeService.create(animalType));
     }
 
     @PutMapping("/{typeId}")

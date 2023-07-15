@@ -19,23 +19,25 @@ public class LocationController {
 
     @GetMapping("/{pointId}")
     public ResponseEntity<Location> getLocation(@PathVariable("pointId") Long id) throws LocationNotFoundException {
-        return ResponseEntity.ok(locationService.getLocation(id));
+        return ResponseEntity.ok(locationService.get(id));
     }
 
     @PostMapping
-    public ResponseEntity<Location> addLocation(@RequestBody LocationDto locationDto) throws LocationAlreadyExistException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(locationService.addLocation(locationDto));
+    public ResponseEntity<Location> addLocation(@RequestBody LocationDto locationDto)
+            throws LocationAlreadyExistException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(locationService.create(locationDto));
     }
 
     @PutMapping("/{pointId}")
     public ResponseEntity<Location> updateLocation(@RequestBody LocationDto locationDto,
-                                            @PathVariable("pointId") Long id) throws LocationAlreadyExistException {
-        return ResponseEntity.ok(locationService.updateLocation(locationDto, id));
+                                            @PathVariable("pointId") Long id)
+            throws LocationAlreadyExistException, LocationNotFoundException {
+        return ResponseEntity.ok(locationService.update(locationDto, id));
     }
 
     @DeleteMapping("/{pointId}")
     public ResponseEntity<?> deleteLocation(@PathVariable("pointId") Long id) throws LocationNotFoundException {
-        locationService.deleteLocation(id);
+        locationService.delete(id);
         return ResponseEntity.ok().build();
     }
 }
