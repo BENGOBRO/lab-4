@@ -21,7 +21,7 @@ public interface AnimalService {
                                   @Positive Integer chipperId, @Positive Long chippingLocationId,
                                   String lifeStatus, String gender,
                                   @Min(0) Integer from, @Min(1) Integer size);
-    Animal add(@Valid AnimalDto animalDto) throws AnimalTypesHasDuplicatesException, AnimalTypeNotFoundException, ChipperIdNotFoundException, ChippingLocationIdNotFound;
+    Animal create(@Valid AnimalDto animalDto) throws AnimalTypesHasDuplicatesException, AnimalTypeNotFoundException, ChipperIdNotFoundException, ChippingLocationIdNotFound;
 
     Animal update(@NotNull @Positive Long id, @Valid AnimalDto animal) throws AnimalNotFoundException,
             UpdateDeadToAliveException, ChipperIdNotFoundException, ChippingLocationIdNotFound,

@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +19,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.bengo.animaltracking.dto.AccountDto;
+import ru.bengo.animaltracking.exception.AccountNotFoundException;
 import ru.bengo.animaltracking.exception.NoAccessException;
 import ru.bengo.animaltracking.exception.UserAlreadyExistException;
 import ru.bengo.animaltracking.model.Account;
@@ -36,6 +39,8 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
     private final BCryptPasswordEncoder passwordEncoder;
 
+    private static final Logger log = LoggerFactory.getLogger(AccountServiceImpl.class);
+
     @Override
     public Optional<Account> findById(@NotNull @Positive Integer id) {
         return accountRepository.findById(id);
@@ -44,7 +49,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     @Override
     public List<Account> search(String firstName, String lastName, String email,
                                 @Min(0) Integer from, @Min(1) Integer size) {
-        PageRequest pageRequest = PageRequest.ofSize(size);
+        PageRequest pageRequest = PageRequest.ofSize(size + from);
 
         Page<Account> page =
                 accountRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrderById(firstName, lastName, email, pageRequest);
@@ -66,31 +71,41 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     }
 
     @Override
-    public Account update(@Valid AccountDto accountDto,@NotNull @Positive Integer id) throws UserAlreadyExistException, NoAccessException {
+    public Account update(@Valid AccountDto accountDto,@NotNull @Positive Integer id) throws UserAlreadyExistException, NoAccessException, AccountNotFoundException {
         String email = accountDto.email();
+        Optional<Account> foundAccount = findById(id);
 
-        if (isEmailExist(email)) {
-            throw new UserAlreadyExistException(Message.ACCOUNT_EXIST.getInfo());
+        if (foundAccount.isEmpty()) {
+            throw new AccountNotFoundException(Message.ACCOUNT_NOT_FOUND.getInfo());
         }
-
-        if (!isUserUpdatingTheirAccount(email)) {
+        if (!isUserUpdatingTheirAccount(id)) {
             throw new NoAccessException(Message.NO_ACCESS.getInfo());
+        }
+        if (!isEmailExist(email, id)) {
+            throw new UserAlreadyExistException(Message.ACCOUNT_EXIST.getInfo());
         }
 
         Account account = convertToEntity(accountDto);
         account.setId(id);
+        account.setPassword(passwordEncoder.encode(account.getPassword()));
         return accountRepository.save(account);
     }
 
     @Override
-    public Long delete(@NotNull @Positive Integer id) throws NoAccessException {
+    public void delete(@NotNull @Positive Integer id) throws NoAccessException, AccountNotFoundException {
         Optional<Account> foundAccount = findById(id);
+
+        if (foundAccount.isEmpty()) {
+            throw new AccountNotFoundException(Message.ACCOUNT_NOT_FOUND.getInfo());
+        }
+
         String email = foundAccount.get().getEmail();
 
-        if (!isUserUpdatingTheirAccount(email)) {
+        if (!isUserUpdatingTheirAccount(id)) {
             throw new NoAccessException(Message.NO_ACCESS.getInfo());
         }
-        return accountRepository.deleteAccountById(id);
+
+        accountRepository.deleteById(id);
     }
 
     @Override
@@ -111,11 +126,26 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
     }
 
-    private boolean isUserUpdatingTheirAccount(String email) {
+    private boolean isEmailExist(String email, Integer id) {
+        Optional<Account> foundOwnerAccount = accountRepository.findById(id);
+        Optional<Account> foundAccount = accountRepository.findAccountByEmail(email);
 
+        if (foundAccount.isPresent() && foundOwnerAccount.isPresent()) {
+            return foundAccount.get() == foundOwnerAccount.get();
+        }
+
+        return true;
+    }
+
+    private boolean isUserUpdatingTheirAccount(Integer id) {
+        Optional<Account> foundAccount = findById(id);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return auth.getName().equals(email);
 
+        if (foundAccount.isPresent()) {
+            return foundAccount.get().getEmail().equals(auth.getName());
+        }
+
+        return false;
     }
 
     private Account convertToEntity(AccountDto accountDto) {

@@ -3,6 +3,7 @@ package ru.bengo.animaltracking.configuration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -30,7 +31,14 @@ public class WebSecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .addFilterAfter(userAuthenticatedFilter, BasicAuthenticationFilter.class)
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/registration").permitAll()
+                        .requestMatchers("/registration")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/accounts/**",
+                                "/animals/**",
+                                "/animals/types/**",
+                                "/locations/**")
+                        .permitAll()
                         .anyRequest().authenticated())
                 .httpBasic();
 

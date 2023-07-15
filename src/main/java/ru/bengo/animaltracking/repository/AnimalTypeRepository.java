@@ -9,5 +9,4 @@ import java.util.Optional;
 @Repository
 public interface AnimalTypeRepository extends CrudRepository<AnimalType, Long> {
     Optional<AnimalType> findByType(String type);
-    Long deleteAnimalTypeById(Long id);
 }

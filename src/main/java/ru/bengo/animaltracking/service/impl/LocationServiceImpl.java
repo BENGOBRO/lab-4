@@ -4,10 +4,13 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.bengo.animaltracking.dto.LocationDto;
 import ru.bengo.animaltracking.exception.LocationAlreadyExistException;
+import ru.bengo.animaltracking.exception.LocationNotFoundException;
 import ru.bengo.animaltracking.model.Location;
 import ru.bengo.animaltracking.model.Message;
 import ru.bengo.animaltracking.repository.LocationRepository;
@@ -21,10 +24,17 @@ import java.util.Optional;
 public class LocationServiceImpl implements LocationService {
 
     private final LocationRepository locationRepository;
+    private final static Logger log = LoggerFactory.getLogger(LocationServiceImpl.class);
 
     @Override
-    public Optional<Location> getLocation(@NotNull @Positive Long id) {
-        return locationRepository.findById(id);
+    public Location getLocation(@NotNull @Positive Long id) throws LocationNotFoundException {
+        Optional<Location> foundLocation = locationRepository.findById(id);
+
+        if (foundLocation.isEmpty()) {
+            throw new LocationNotFoundException(Message.LOCATION_NOT_FOUND.getInfo());
+        }
+
+        return foundLocation.get();
     }
 
     @Override
@@ -36,8 +46,15 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
-    public Long deleteLocation(@NotNull @Positive Long id) {
-        return locationRepository.deleteLocationById(id);
+    public void deleteLocation(@NotNull @Positive Long id) throws LocationNotFoundException {
+        Optional<Location> foundLocation = locationRepository.findById(id);
+        log.warn("HERE");
+
+        if (foundLocation.isEmpty()) {
+            throw new LocationNotFoundException(Message.LOCATION_NOT_FOUND.getInfo());
+        }
+
+        locationRepository.deleteById(id);
     }
 
     @Override

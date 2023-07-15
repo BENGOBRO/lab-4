@@ -10,10 +10,7 @@ import java.util.Optional;
 
 @Repository
 public interface AccountRepository extends CrudRepository<Account, Integer> {
-
     Optional<Account> findAccountByEmail(String email);
-    Long deleteAccountById(Integer id);
-
     Page<Account> findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrderById(
             String firstName, String lastName, String email, Pageable pageable);
 }

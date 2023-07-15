@@ -15,15 +15,15 @@ public record AnimalDto (
 
         @NotNull
         @Positive
-        Float weight,
+        Double weight,
 
         @NotNull
         @Positive
-        Float length,
+        Double length,
 
         @NotNull
         @Positive
-        Float height,
+        Double height,
 
         @NotNull
         @GenderAnnotation

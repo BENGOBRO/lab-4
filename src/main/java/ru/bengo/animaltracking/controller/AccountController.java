@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.bengo.animaltracking.dto.AccountDto;
+import ru.bengo.animaltracking.exception.AccountNotFoundException;
 import ru.bengo.animaltracking.exception.NoAccessException;
 import ru.bengo.animaltracking.exception.UserAlreadyExistException;
 import ru.bengo.animaltracking.model.Account;
@@ -24,7 +25,6 @@ public class AccountController {
         Optional<Account> foundAccount = accountService.findById(id);
 
         return foundAccount.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-
     }
 
     @GetMapping("/search")
@@ -40,24 +40,14 @@ public class AccountController {
 
     @PutMapping("/{accountId}")
     public ResponseEntity<Account> updateAccount(@RequestBody AccountDto accountDto,
-                                               @PathVariable("accountId") Integer id) throws UserAlreadyExistException, NoAccessException {
+                                               @PathVariable("accountId") Integer id) throws UserAlreadyExistException, NoAccessException, AccountNotFoundException {
         Account updatedAccount = accountService.update(accountDto, id);
-
-        if (updatedAccount != null) {
-            return ResponseEntity.ok(updatedAccount);
-        }
-
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(updatedAccount);
     }
 
     @DeleteMapping("/{accountId}")
-    public ResponseEntity<?> deleteAccount(@PathVariable("accountId") Integer id) throws NoAccessException {
-        Long numOfDeletedEntities = accountService.delete(id);
-
-        if (numOfDeletedEntities == 0) {
-            return ResponseEntity.notFound().build();
-        }
-
+    public ResponseEntity<?> deleteAccount(@PathVariable("accountId") Integer id) throws NoAccessException, AccountNotFoundException {
+        accountService.delete(id);
         return ResponseEntity.ok().build();
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.bengo.animaltracking.exception.LocationAlreadyExistException;
+import ru.bengo.animaltracking.exception.LocationNotFoundException;
 
 @RestControllerAdvice
 public class LocationControllerAdvice {
@@ -14,4 +15,8 @@ public class LocationControllerAdvice {
         return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 
+    @ExceptionHandler(LocationNotFoundException.class)
+    public ResponseEntity<?> onLocationNotFoundException(LocationNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
 }

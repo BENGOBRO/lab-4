@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import ru.bengo.animaltracking.dto.AccountDto;
+import ru.bengo.animaltracking.exception.AccountNotFoundException;
 import ru.bengo.animaltracking.exception.NoAccessException;
 import ru.bengo.animaltracking.exception.UserAlreadyExistException;
 import ru.bengo.animaltracking.model.Account;
@@ -19,7 +20,7 @@ public interface AccountService {
 
     Account register(@Valid AccountDto accountDto) throws UserAlreadyExistException;
 
-    Account update(@Valid AccountDto accountDto, @NotNull @Positive Integer id) throws UserAlreadyExistException, NoAccessException;
+    Account update(@Valid AccountDto accountDto, @NotNull @Positive Integer id) throws UserAlreadyExistException, NoAccessException, AccountNotFoundException;
 
-    Long delete(@NotNull @Positive Integer id) throws NoAccessException;
+    void delete(@NotNull @Positive Integer id) throws NoAccessException, AccountNotFoundException;
 }

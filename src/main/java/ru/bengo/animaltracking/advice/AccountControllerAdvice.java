@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.bengo.animaltracking.exception.AccountNotFoundException;
 import ru.bengo.animaltracking.exception.NoAccessException;
 import ru.bengo.animaltracking.exception.UserAlreadyExistException;
 
@@ -17,8 +18,11 @@ public class AccountControllerAdvice {
 
     @ExceptionHandler(NoAccessException.class)
     public ResponseEntity<?> onNoAccessException(NoAccessException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
-
+    @ExceptionHandler(AccountNotFoundException.class)
+    public ResponseEntity<?> onAccountNotFoundException(AccountNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
 }

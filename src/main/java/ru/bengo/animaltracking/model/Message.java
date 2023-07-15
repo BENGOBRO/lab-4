@@ -17,7 +17,10 @@ public enum Message {
     NEW_CHIPPING_LOCATION_ID_EQUALS_FIRST_VISITED_LOCATION("New chipping location id equals first visited location id"),
     NO_ACCESS("No rights to access"),
     ANIMAL_DOES_NOT_HAVE_TYPE("Animal type with oldTypeId does not exist for animal with animalId"),
-    ANIMAL_TYPES_CONTAIN_NEW_ANIMAL_TYPE("The type of the animal with typeId already exists in the animal with animalId");
+    ANIMAL_TYPES_CONTAIN_NEW_ANIMAL_TYPE("The type of the animal with typeId already exists in the animal with animalId"),
+    ACCOUNT_NOT_FOUND("Account with this id haven't found"),
+    LOCATION_NOT_FOUND("Location with this id haven't found")
+    ;
 
     private final String info;
 

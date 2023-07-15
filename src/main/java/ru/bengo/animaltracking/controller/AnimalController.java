@@ -1,6 +1,8 @@
 package ru.bengo.animaltracking.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +23,7 @@ import java.util.Optional;
 public class AnimalController {
 
     private final AnimalService animalService;
-
+    private static final Logger log = LoggerFactory.getLogger(AnimalController.class);
     @GetMapping("/{animalId}")
     public ResponseEntity<Animal> getAnimal(@PathVariable(value = "animalId") Long id) {
         Optional<Animal> foundAnimal = animalService.findById(id);
@@ -46,7 +48,7 @@ public class AnimalController {
     @PostMapping
     public ResponseEntity<Animal> addAnimal(@RequestBody AnimalDto animalDto) throws AnimalTypesHasDuplicatesException,
             ChippingLocationIdNotFound, ChipperIdNotFoundException, AnimalTypeNotFoundException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(animalService.add(animalDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(animalService.create(animalDto));
     }
 
     @PutMapping("/{animalId}")

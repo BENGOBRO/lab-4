@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -21,6 +23,7 @@ import java.util.Optional;
 public class AnimalTypeServiceImpl implements AnimalTypeService {
 
     private final AnimalTypeRepository animalTypeRepository;
+    private static final Logger log = LoggerFactory.getLogger(AnimalTypeServiceImpl.class);
 
     @Override
     public Optional<AnimalType> get(@NotNull @Positive Long id) {
@@ -29,9 +32,11 @@ public class AnimalTypeServiceImpl implements AnimalTypeService {
 
     @Override
     public AnimalType add(@Valid AnimalType animalType) throws AnimalTypeAlreadyExist {
+        log.warn(">> Type here");
         if (isAnimalTypeWithTypeExist(animalType.getType())) {
             throw new AnimalTypeAlreadyExist(Message.ANIMAL_TYPE_EXIST.getInfo());
         }
+        log.warn("I am here");
         return animalTypeRepository.save(animalType);
     }
 
@@ -51,8 +56,8 @@ public class AnimalTypeServiceImpl implements AnimalTypeService {
     }
 
     @Override
-    public Long delete(@NotNull @Positive Long id) {
-        return animalTypeRepository.deleteAnimalTypeById(id);
+    public void delete(@NotNull @Positive Long id) {
+        animalTypeRepository.deleteById(id);
     }
 
 

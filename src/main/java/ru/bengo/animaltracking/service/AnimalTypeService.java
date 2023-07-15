@@ -16,5 +16,5 @@ public interface AnimalTypeService {
 
     AnimalType update(@NotNull @Positive Long id, @Valid AnimalType animalType) throws AnimalTypeAlreadyExist;
 
-    Long delete(@NotNull @Positive Long id);
+    void delete(@NotNull @Positive Long id);
 }

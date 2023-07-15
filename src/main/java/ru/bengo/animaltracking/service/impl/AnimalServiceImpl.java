@@ -3,9 +3,13 @@ package ru.bengo.animaltracking.service.impl;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -13,9 +17,11 @@ import ru.bengo.animaltracking.dto.AnimalDto;
 import ru.bengo.animaltracking.dto.TypeDto;
 import ru.bengo.animaltracking.exception.*;
 import ru.bengo.animaltracking.model.Animal;
+import ru.bengo.animaltracking.model.Gender;
 import ru.bengo.animaltracking.model.LifeStatus;
 import ru.bengo.animaltracking.model.Message;
 import ru.bengo.animaltracking.repository.AnimalRepository;
+import ru.bengo.animaltracking.repository.LocationRepository;
 import ru.bengo.animaltracking.service.AccountService;
 import ru.bengo.animaltracking.service.AnimalService;
 import ru.bengo.animaltracking.service.AnimalTypeService;
@@ -31,12 +37,15 @@ import java.util.Optional;
 public class AnimalServiceImpl implements AnimalService {
 
     private AnimalRepository animalRepository;
+    private LocationRepository locationRepository;
 
     private AnimalTypeService animalTypeService;
 
     private AccountService accountService;
 
     private LocationService locationService;
+
+    private static final Logger log = LoggerFactory.getLogger(AnimalServiceImpl.class);
 
     @Override
     public Optional<Animal> findById(@NotNull @Positive Long id) {
@@ -45,23 +54,25 @@ public class AnimalServiceImpl implements AnimalService {
 
     @Override
     public List<Animal> search(LocalDateTime startDateTime, LocalDateTime endDateTime,
-                                         @Positive Integer chipperId, @Positive Long chippingLocationId,
-                                         String lifeStatus, String gender,
-                                         @Min(0) Integer from, @Min(1) Integer size) {
+                               @Positive Integer chipperId, @Positive Long chippingLocationId,
+                               String lifeStatus, String gender,
+                               @Min(0) Integer from, @Min(1) Integer size) {
+
         PageRequest pageRequest = PageRequest.of(from, size);
-//        Page<Animal> page =
-//                animalRepository.findByChippingDateTimeContainingOrDeathDateTimeContainingOrChipperIdContainingOrLifeStatusContainingOrGenderContaining(startDateTime, endDateTime, chipperId, lifeStatus, gender, pageRequest);
-//        return page.getContent();
-        return null;
+
+        Page<Animal> page = animalRepository.search(startDateTime, endDateTime, chipperId,
+                        chippingLocationId, lifeStatus, gender, pageRequest);
+        return page.getContent();
     }
 
     @Override
-    public Animal add(@Valid AnimalDto animalDto) throws AnimalTypesHasDuplicatesException,
+    public Animal create(@Valid AnimalDto animalDto) throws AnimalTypesHasDuplicatesException,
             AnimalTypeNotFoundException, ChipperIdNotFoundException, ChippingLocationIdNotFound {
 
         var animalTypes = animalDto.animalTypes();
         var chipperId = animalDto.chipperId();
         var chippingLocationId = animalDto.chippingLocationId();
+        log.warn("iam here");
 
         if (hasAnimalTypesDuplicates(animalTypes)) {
             throw new AnimalTypesHasDuplicatesException(Message.ANIMAL_TYPES_HAS_DUPLICATES.getInfo());
@@ -76,6 +87,7 @@ public class AnimalServiceImpl implements AnimalService {
             throw new ChippingLocationIdNotFound(Message.CHIPPING_LOCATION_ID_NOT_FOUND.getInfo());
         }
 
+        log.warn(">> create animal");
         Animal animal = convertToEntity(animalDto);
         return animalRepository.save(animal);
     }
@@ -185,7 +197,15 @@ public class AnimalServiceImpl implements AnimalService {
     }
 
     private Animal convertToEntity(AnimalDto animalDto) {
-        return new Animal();
+        return Animal.builder()
+                .animalTypesJson(animalDto.animalTypes())
+                .weight(animalDto.weight())
+                .length(animalDto.length())
+                .height(animalDto.height())
+                .gender(Gender.valueOf(animalDto.gender()))
+                .chipperId(animalDto.chipperId())
+                .chippingLocationId(animalDto.chippingLocationId())
+                .build();
     }
     private boolean isDead(LifeStatus lifeStatus) {
         return lifeStatus.name().equals(LifeStatus.DEAD.name());
@@ -210,7 +230,7 @@ public class AnimalServiceImpl implements AnimalService {
     }
 
     private boolean isChippingLocationExist(Long id) {
-        return locationService.getLocation(id).isPresent();
+        return locationRepository.findById(id).isPresent();
     }
 
     private boolean hasAnimalTypesDuplicates(List<Long> animalTypes) {
