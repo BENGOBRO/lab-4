@@ -6,8 +6,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import ru.bengo.animaltracking.configuration.filter.UserAuthenticatedFilter;
@@ -18,6 +23,15 @@ import ru.bengo.animaltracking.configuration.filter.UserAuthenticatedFilter;
 public class WebSecurityConfig {
 
     private final UserAuthenticatedFilter userAuthenticatedFilter;
+
+    @Bean
+    public InMemoryUserDetailsManager userDetailsManager(PasswordEncoder passwordEncoder) {
+        UserDetails user = User.withUsername("test")
+                .password(passwordEncoder.encode("secret"))
+                .roles("USER")
+                .build();
+        return new InMemoryUserDetailsManager(user);
+    }
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {

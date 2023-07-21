@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface AccountService {
-    Optional<Account> get(@NotNull @Positive Integer id);
+    Account get(@NotNull @Positive Integer id) throws AccountNotFoundException;
     List<Account> search(String firstName, String lastName, String email,
                          @Min(0) Integer from, @Min(1) Integer size);
 

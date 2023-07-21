@@ -20,6 +20,7 @@ import ru.bengo.animaltracking.model.Animal;
 import ru.bengo.animaltracking.model.Gender;
 import ru.bengo.animaltracking.model.LifeStatus;
 import ru.bengo.animaltracking.model.Message;
+import ru.bengo.animaltracking.repository.AccountRepository;
 import ru.bengo.animaltracking.repository.AnimalRepository;
 import ru.bengo.animaltracking.repository.LocationRepository;
 import ru.bengo.animaltracking.service.AccountService;
@@ -46,6 +47,7 @@ public class AnimalServiceImpl implements AnimalService {
     private LocationService locationService;
 
     private static final Logger log = LoggerFactory.getLogger(AnimalServiceImpl.class);
+    private final AccountRepository accountRepository;
 
     @Override
     public Animal create(@Valid AnimalDto animalDto) throws AnimalTypesHasDuplicatesException,
@@ -227,7 +229,7 @@ public class AnimalServiceImpl implements AnimalService {
     }
 
     private boolean isChipperIdExist(Integer id) {
-        return accountService.get(id).isPresent();
+        return accountRepository.findById(id).isPresent();
     }
 
     private boolean isChippingLocationExist(Long id) {

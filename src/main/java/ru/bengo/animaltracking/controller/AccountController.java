@@ -21,10 +21,8 @@ public class AccountController {
     private final AccountService accountService;
 
     @GetMapping("/{accountId}")
-    public ResponseEntity<Account> getAccount(@PathVariable("accountId") Integer id) {
-        Optional<Account> foundAccount = accountService.get(id);
-
-        return foundAccount.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<Account> getAccount(@PathVariable("accountId") Integer id) throws AccountNotFoundException {
+        return ResponseEntity.ok(accountService.get(id));
     }
 
     @GetMapping("/search")
@@ -41,8 +39,7 @@ public class AccountController {
     @PutMapping("/{accountId}")
     public ResponseEntity<Account> updateAccount(@RequestBody AccountDto accountDto,
                                                @PathVariable("accountId") Integer id) throws UserAlreadyExistException, NoAccessException, AccountNotFoundException {
-        Account updatedAccount = accountService.update(accountDto, id);
-        return ResponseEntity.ok(updatedAccount);
+        return ResponseEntity.ok(accountService.update(accountDto, id));
     }
 
     @DeleteMapping("/{accountId}")

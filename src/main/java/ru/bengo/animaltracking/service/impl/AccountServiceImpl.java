@@ -55,15 +55,21 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     }
 
     @Override
-    public Optional<Account> get(@NotNull @Positive Integer id) {
-        return accountRepository.findById(id);
+    public Account get(@NotNull @Positive Integer id) throws AccountNotFoundException {
+        Optional<Account> foundAccount = accountRepository.findById(id);
+
+        if (foundAccount.isEmpty()) {
+            throw new AccountNotFoundException(Message.ACCOUNT_NOT_FOUND.getInfo());
+        }
+
+        return foundAccount.get();
     }
 
 
     @Override
     public Account update(@Valid AccountDto accountDto,@NotNull @Positive Integer id) throws UserAlreadyExistException, NoAccessException, AccountNotFoundException {
         String email = accountDto.email();
-        Optional<Account> foundAccount = get(id);
+        Optional<Account> foundAccount = accountRepository.findById(id);
 
         if (foundAccount.isEmpty()) {
             throw new AccountNotFoundException(Message.ACCOUNT_NOT_FOUND.getInfo());
@@ -83,7 +89,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
     @Override
     public void delete(@NotNull @Positive Integer id) throws NoAccessException, AccountNotFoundException {
-        Optional<Account> foundAccount = get(id);
+        Optional<Account> foundAccount = accountRepository.findById(id);
 
         if (foundAccount.isEmpty()) {
             throw new AccountNotFoundException(Message.ACCOUNT_NOT_FOUND.getInfo());
@@ -139,7 +145,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     }
 
     private boolean isUserUpdatingTheirAccount(Integer id) {
-        Optional<Account> foundAccount = get(id);
+        Optional<Account> foundAccount = accountRepository.findById(id);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (foundAccount.isPresent()) {
