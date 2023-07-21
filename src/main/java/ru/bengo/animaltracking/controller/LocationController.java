@@ -17,15 +17,15 @@ public class LocationController {
 
     private final LocationService locationService;
 
+    @PostMapping
+    public ResponseEntity<Location> createLocation(@RequestBody LocationDto locationDto)
+            throws LocationAlreadyExistException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(locationService.create(locationDto));
+    }
+
     @GetMapping("/{pointId}")
     public ResponseEntity<Location> getLocation(@PathVariable("pointId") Long id) throws LocationNotFoundException {
         return ResponseEntity.ok(locationService.get(id));
-    }
-
-    @PostMapping
-    public ResponseEntity<Location> addLocation(@RequestBody LocationDto locationDto)
-            throws LocationAlreadyExistException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(locationService.create(locationDto));
     }
 
     @PutMapping("/{pointId}")

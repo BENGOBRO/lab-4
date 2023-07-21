@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.bengo.animaltracking.exception.AnimalTypeAlreadyExist;
+import ru.bengo.animaltracking.exception.AnimalTypeNotFoundException;
 import ru.bengo.animaltracking.model.AnimalType;
 import ru.bengo.animaltracking.model.Message;
 import ru.bengo.animaltracking.repository.AnimalTypeRepository;
@@ -27,32 +28,36 @@ public class AnimalTypeServiceImpl implements AnimalTypeService {
 
     @Override
     public AnimalType create(@Valid AnimalType animalType) throws AnimalTypeAlreadyExist {
-        log.warn(">> Type here");
         if (isAnimalTypeWithTypeExist(animalType.getType())) {
             throw new AnimalTypeAlreadyExist(Message.ANIMAL_TYPE_EXIST.getInfo());
         }
-        log.warn("I am here");
         return animalTypeRepository.save(animalType);
     }
 
     @Override
-    public Optional<AnimalType> get(@NotNull @Positive Long id) {
-        return animalTypeRepository.findById(id);
+    public AnimalType get(@NotNull @Positive Long id) throws AnimalTypeNotFoundException {
+        Optional<AnimalType> foundAnimalType = animalTypeRepository.findById(id);
+
+        if (foundAnimalType.isEmpty()) {
+            throw new AnimalTypeNotFoundException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo());
+        }
+
+        return foundAnimalType.get();
     }
 
     @Override
-    public AnimalType update(Long id, AnimalType animalType) throws AnimalTypeAlreadyExist {
+    public AnimalType update(Long id, AnimalType animalType) throws AnimalTypeAlreadyExist, AnimalTypeNotFoundException {
         Optional<AnimalType> foundAnimalType = animalTypeRepository.findById(id);
 
-        if (foundAnimalType.isPresent()) {
-            if (isAnimalTypeWithTypeExist(animalType.getType())) {
-                throw new AnimalTypeAlreadyExist(Message.ANIMAL_TYPE_EXIST.getInfo());
-            }
-            animalType.setId(id);
-            return animalTypeRepository.save(animalType);
+        if (foundAnimalType.isEmpty()) {
+            throw new AnimalTypeNotFoundException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo());
+        }
+        if (isAnimalTypeWithTypeExist(animalType.getType())) {
+            throw new AnimalTypeAlreadyExist(Message.ANIMAL_TYPE_EXIST.getInfo());
         }
 
-        return null;
+        animalType.setId(id);
+        return animalTypeRepository.save(animalType);
     }
 
     @Override

@@ -3,7 +3,6 @@ package ru.bengo.animaltracking.service.impl;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -39,11 +38,8 @@ public class AnimalServiceImpl implements AnimalService {
 
     private AnimalRepository animalRepository;
     private LocationRepository locationRepository;
-
     private AnimalTypeService animalTypeService;
-
     private AccountService accountService;
-
     private LocationService locationService;
 
     private static final Logger log = LoggerFactory.getLogger(AnimalServiceImpl.class);
@@ -77,8 +73,14 @@ public class AnimalServiceImpl implements AnimalService {
     }
 
     @Override
-    public Optional<Animal> get(@NotNull @Positive Long id) {
-        return animalRepository.findById(id);
+    public Animal get(@NotNull @Positive Long id) throws AnimalNotFoundException {
+        Optional<Animal> foundAnimal = animalRepository.findById(id);
+
+        if (foundAnimal.isEmpty()) {
+            throw new AnimalNotFoundException(Message.ANIMAL_NOT_FOUND.getInfo());
+        }
+
+        return foundAnimal.get();
     }
 
 
@@ -155,14 +157,11 @@ public class AnimalServiceImpl implements AnimalService {
 
         Animal foundAnimal = foundOptionalAnimal.get();
         var animalTypes = foundAnimal.getAnimalTypesJson();
-        if (animalTypeService.get(typeId).isEmpty()) {
-            throw new AnimalTypeNotFoundException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo());
-        }
         if (isAnimalTypesContainNewAnimalTypeId(foundAnimal.getAnimalTypesJson(), typeId)) {
             throw new AnimalTypesContainNewAnimalTypeException(Message.ANIMAL_TYPES_CONTAIN_NEW_ANIMAL_TYPE.getInfo());
         }
 
-        animalTypes.add(animalTypeService.get(typeId).get().getId());
+        animalTypes.add(animalTypeService.get(typeId).getId());
         // foundAnimal.setAnimalTypes(animalTypes);
         return animalRepository.save(foundAnimal);
     }
@@ -179,9 +178,8 @@ public class AnimalServiceImpl implements AnimalService {
 
         Long newTypeId = typeDto.newTypeId();
         Long oldTypeId = typeDto.oldTypeId();
-        if (animalTypeService.get(newTypeId).isEmpty() || animalTypeService.get(oldTypeId).isEmpty()) {
-            throw new AnimalTypeNotFoundException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo());
-        }
+        animalTypeService.get(newTypeId);
+        animalTypeService.get(oldTypeId);
         if (!isAnimalTypeExist(oldTypeId)) {
             throw new AnimalDoesNotHaveTypeException(Message.ANIMAL_DOES_NOT_HAVE_TYPE.getInfo());
         }
@@ -214,17 +212,14 @@ public class AnimalServiceImpl implements AnimalService {
         return lifeStatus.name().equals(LifeStatus.DEAD.name());
     }
 
-    private boolean isAnimalTypesExist(List<Long> animalTypes) {
+    private boolean isAnimalTypesExist(List<Long> animalTypes) throws AnimalTypeNotFoundException {
         for (var id: animalTypes) {
             var foundAnimalType = animalTypeService.get(id);
-            if (foundAnimalType.isEmpty()) {
-                return false;
-            }
         }
         return true;
     }
 
-    private boolean isAnimalTypeExist(Long animalType) {
+    private boolean isAnimalTypeExist(Long animalType) throws AnimalTypeNotFoundException {
         return isAnimalTypesExist(List.of(animalType));
     }
 

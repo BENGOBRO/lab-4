@@ -30,7 +30,7 @@ public class AccountControllerTest {
 
     @Test
     @WithMockUser(value = "test")
-    public void whenValidId_shouldReturnAccount() throws Exception {
+    public void whenGetAccount_shouldReturn200() throws Exception {
         int id = 1;
 
         when(accountService.get(id)).thenReturn(
@@ -45,18 +45,21 @@ public class AccountControllerTest {
                 .andExpect(jsonPath("email", Matchers.is("test@test.com")));
     }
 
-//    @Test
-//    @WithMockUser(value = "test")
-//    public void whenNotPositiveId_shouldReturn400() throws Exception {
-//        mockMvc.perform(get("/accounts/{accountId}", 0))
-//                .andExpect(status().isBadRequest());
-//    }
-//
-//    @Test
-//    @WithMockUser(value = "test")
-//    public void whenNullId_shouldReturn400() throws Exception {
-//        mockMvc.perform(get("/account/{accountId}", null))
-//                .andExpect(status().isBadRequest());
-//    }
+    @Test
+    @WithMockUser(value = "test")
+    public void whenUpdateAccount_shouldReturn200() {
 
+    }
+
+    @Test
+    @WithMockUser(value = "test")
+    public void whenDeleteAccount_shouldReturn200() {
+
+    }
+
+    @Test
+    @WithMockUser(value = "test")
+    public void whenSearchAccount_shouldReturn200() {
+
+    }
 }

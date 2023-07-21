@@ -15,7 +15,6 @@ import ru.bengo.animaltracking.service.AnimalService;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/animals")
@@ -24,17 +23,37 @@ public class AnimalController {
 
     private final AnimalService animalService;
     private static final Logger log = LoggerFactory.getLogger(AnimalController.class);
+
+    @PostMapping
+    public ResponseEntity<Animal> createAnimal(@RequestBody AnimalDto animalDto) throws AnimalTypesHasDuplicatesException,
+            ChippingLocationIdNotFound, ChipperIdNotFoundException, AnimalTypeNotFoundException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(animalService.create(animalDto));
+    }
+
     @GetMapping("/{animalId}")
-    public ResponseEntity<Animal> getAnimal(@PathVariable(value = "animalId") Long id) {
-        Optional<Animal> foundAnimal = animalService.get(id);
+    public ResponseEntity<Animal> getAnimal(@PathVariable(value = "animalId") Long id) throws AnimalNotFoundException {
+        return ResponseEntity.ok(animalService.get(id));
+    }
 
-        return foundAnimal.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    @PutMapping("/{animalId}")
+    public ResponseEntity<Animal> updateAnimal(@PathVariable("animalId") Long id,
+                                               @RequestBody AnimalDto animalDto) throws AnimalNotFoundException,
+            NewChippingLocationIdEqualsFirstVisitedLocationIdException,
+            UpdateDeadToAliveException, ChippingLocationIdNotFound, ChipperIdNotFoundException {
+        return ResponseEntity.ok(animalService.update(id, animalDto));
+    }
 
+    @DeleteMapping("/{animalId}")
+    public ResponseEntity<?> deleteAnimal(@PathVariable("animalId") Long id) throws AnimalNotFoundException {
+        animalService.delete(id);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Animal>> searchAnimals(@RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
-                                                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime,
+    public ResponseEntity<List<Animal>> searchAnimals(@RequestParam(required = false)
+                                                      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
+                                                      @RequestParam(required = false)
+                                                      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime,
                                                       @RequestParam(required = false) Integer chipperId,
                                                       @RequestParam(required = false) Long chippingLocationId,
                                                       @RequestParam(required = false) String lifeStatus,
@@ -45,36 +64,18 @@ public class AnimalController {
                 chippingLocationId, lifeStatus, gender, from, size));
     }
 
-    @PostMapping
-    public ResponseEntity<Animal> addAnimal(@RequestBody AnimalDto animalDto) throws AnimalTypesHasDuplicatesException,
-            ChippingLocationIdNotFound, ChipperIdNotFoundException, AnimalTypeNotFoundException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(animalService.create(animalDto));
-    }
-
-    @PutMapping("/{animalId}")
-    public ResponseEntity<Animal> updateAnimal(@PathVariable("animalId") Long id, @RequestBody AnimalDto animalDto) throws AnimalNotFoundException,
-            NewChippingLocationIdEqualsFirstVisitedLocationIdException, UpdateDeadToAliveException, ChippingLocationIdNotFound,
-            ChipperIdNotFoundException {
-        return ResponseEntity.ok(animalService.update(id, animalDto));
-    }
-
-    @DeleteMapping("/{animalId}")
-    public ResponseEntity<?> deleteAnimal(@PathVariable("animalId") Long id) throws AnimalNotFoundException {
-        animalService.delete(id);
-        return ResponseEntity.ok().build();
-    }
-
     @PostMapping("/{animalId}/types/{typeId}")
     public ResponseEntity<Animal> addAnimalTypeToAnimal(@PathVariable("animalId") Long animalId,
-                                                   @PathVariable("typeId") Long typeId) throws AnimalNotFoundException,
+                                                        @PathVariable("typeId") Long typeId) throws AnimalNotFoundException,
             AnimalTypesContainNewAnimalTypeException, AnimalTypeNotFoundException {
         return ResponseEntity.ok(animalService.addAnimalTypeToAnimal(animalId, typeId));
     }
 
     @PutMapping("/{animalId}/types")
     public ResponseEntity<Animal> updateAnimalTypeInAnimal(@PathVariable("animalId") Long animalId,
-                                                      @RequestBody TypeDto typeDto) throws AnimalNotFoundException,
+                                                           @RequestBody TypeDto typeDto) throws AnimalNotFoundException,
             AnimalTypeAlreadyExist, AnimalTypeNotFoundException, AnimalDoesNotHaveTypeException {
         return ResponseEntity.ok(animalService.updateAnimalTypesInAnimal(animalId, typeDto));
     }
+
 }

@@ -11,7 +11,6 @@ import ru.bengo.animaltracking.model.Account;
 import ru.bengo.animaltracking.service.AccountService;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,18 +24,7 @@ public class AccountController {
         return ResponseEntity.ok(accountService.get(id));
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<List<Account>> searchAccounts(
-            @RequestParam(required = false) String firstName,
-            @RequestParam(required = false) String lastName,
-            @RequestParam(required = false) String email,
-            @RequestParam(defaultValue = "0") Integer from,
-            @RequestParam(defaultValue = "10") Integer size) {
-
-        return ResponseEntity.ok(accountService.search(firstName, lastName, email, from, size));
-    }
-
-    @PutMapping("/{accountId}")
+        @PutMapping("/{accountId}")
     public ResponseEntity<Account> updateAccount(@RequestBody AccountDto accountDto,
                                                @PathVariable("accountId") Integer id) throws UserAlreadyExistException, NoAccessException, AccountNotFoundException {
         return ResponseEntity.ok(accountService.update(accountDto, id));
@@ -46,5 +34,16 @@ public class AccountController {
     public ResponseEntity<?> deleteAccount(@PathVariable("accountId") Integer id) throws NoAccessException, AccountNotFoundException {
         accountService.delete(id);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Account>> searchAccounts(
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String email,
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size) {
+
+        return ResponseEntity.ok(accountService.search(firstName, lastName, email, from, size));
     }
 }

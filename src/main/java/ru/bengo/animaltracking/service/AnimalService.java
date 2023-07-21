@@ -19,7 +19,7 @@ public interface AnimalService {
             throws AnimalTypesHasDuplicatesException, AnimalTypeNotFoundException,
             ChipperIdNotFoundException, ChippingLocationIdNotFound;
 
-    Optional<Animal> get(@NotNull @Positive Long id);
+    Animal get(@NotNull @Positive Long id) throws AnimalNotFoundException;
 
     Animal update(@NotNull @Positive Long id, @Valid AnimalDto animal) throws AnimalNotFoundException,
             UpdateDeadToAliveException, ChipperIdNotFoundException, ChippingLocationIdNotFound,
