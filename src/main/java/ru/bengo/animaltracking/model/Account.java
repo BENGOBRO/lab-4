@@ -15,11 +15,18 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @Column(nullable = false)
     private String firstName;
+
+    @Column(nullable = false)
     private String lastName;
+
+    @Column(nullable = false, unique = true)
     private String email;
 
     @ToString.Exclude
     @JsonIgnore
+    @Column(nullable = false)
     private String password;
 }

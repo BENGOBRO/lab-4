@@ -140,9 +140,8 @@ public class AnimalServiceImpl implements AnimalService {
 
         PageRequest pageRequest = PageRequest.of(from, size);
 
-        Page<Animal> page = animalRepository.search(startDateTime, endDateTime, chipperId,
+        return animalRepository.search(startDateTime, endDateTime, chipperId,
                 chippingLocationId, lifeStatus, gender, pageRequest);
-        return page.getContent();
     }
 
     @Override

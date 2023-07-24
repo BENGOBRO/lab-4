@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,7 +27,8 @@ import ru.bengo.animaltracking.model.User;
 import ru.bengo.animaltracking.repository.AccountRepository;
 import ru.bengo.animaltracking.service.AccountService;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Validated
@@ -109,10 +109,10 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
                                 @Min(0) Integer from, @Min(1) Integer size) {
         PageRequest pageRequest = PageRequest.ofSize(size + from);
 
-        Page<Account> page =
+        List<Account> accounts =
                 accountRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrderById(firstName, lastName, email, pageRequest);
 
-        return page.stream().skip(from).toList();
+        return accounts.stream().skip(from).toList();
     }
 
     @Override

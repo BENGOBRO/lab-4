@@ -27,30 +27,39 @@ public class Animal {
 
     @ManyToMany
     @JsonIgnore
+    @Column(nullable = false)
     private Set<AnimalType> animalTypes;
 
     @Transient
     @JsonProperty("animalTypes")
     private List<Long> animalTypesJson;
 
+    @Column(nullable = false)
     private Double weight;
 
+    @Column(nullable = false)
     private Double length;
 
+    @Column(nullable = false)
     private Double height;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Gender gender;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private LifeStatus lifeStatus;
 
     @CreatedDate
     @Temporal(TemporalType.TIMESTAMP)
+    @Column(nullable = false)
     private LocalDateTime chippingDateTime;
 
+    @Column(nullable = false)
     private Integer chipperId;
 
+    @Column(nullable = false)
     private Long chippingLocationId;
 
     @ManyToMany
