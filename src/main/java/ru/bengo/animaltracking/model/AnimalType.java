@@ -1,17 +1,24 @@
 package ru.bengo.animaltracking.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import lombok.*;
 
-@Data
 @Entity
+@Table(name = "animal_types")
+@Getter
+@Setter
+@Builder
+@ToString
+@NoArgsConstructor
+@RequiredArgsConstructor
+@AllArgsConstructor
 public class AnimalType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false, updatable = false)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String type;
 }

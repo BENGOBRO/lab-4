@@ -1,29 +1,27 @@
 package ru.bengo.animaltracking.model;
 
 import jakarta.persistence.*;
-import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
 @Entity
 @Table(name = "locations")
+@Getter
+@Setter
 @Builder
+@ToString
 @NoArgsConstructor
+@RequiredArgsConstructor
 @AllArgsConstructor
 public class Location {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false, updatable = false)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private Double latitude;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private Double longitude;
 }

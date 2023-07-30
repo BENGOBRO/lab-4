@@ -1,9 +1,6 @@
 package ru.bengo.animaltracking.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 
@@ -14,11 +11,13 @@ import java.time.LocalDateTime;
 public class AnimalVisitedLocation {
 
     @Id
+    @Column(nullable = false)
     private Long id;
 
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
     private LocalDateTime dateTimeOfVisitLocationPoint;
+
     private Long locationPointId;
 
 

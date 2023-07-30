@@ -4,16 +4,20 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Data
 @Entity
-@Builder
-@NoArgsConstructor
 @Table(name = "accounts")
+@Getter
+@Setter
+@Builder
+@ToString
+@NoArgsConstructor
+@RequiredArgsConstructor
 @AllArgsConstructor
 public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false, updatable = false)
     private Integer id;
 
     @Column(nullable = false)
