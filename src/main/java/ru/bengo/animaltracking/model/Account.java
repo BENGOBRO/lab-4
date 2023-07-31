@@ -11,7 +11,6 @@ import lombok.*;
 @Builder
 @ToString
 @NoArgsConstructor
-@RequiredArgsConstructor
 @AllArgsConstructor
 public class Account {
 

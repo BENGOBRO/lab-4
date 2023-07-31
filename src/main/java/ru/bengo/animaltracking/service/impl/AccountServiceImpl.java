@@ -32,7 +32,7 @@ import java.util.Optional;
 
 @Service
 @Validated
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService, UserDetailsService {
 
     private final AccountRepository accountRepository;

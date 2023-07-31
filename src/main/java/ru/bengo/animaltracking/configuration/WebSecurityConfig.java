@@ -24,14 +24,14 @@ public class WebSecurityConfig {
 
     private final UserAuthenticatedFilter userAuthenticatedFilter;
 
-    @Bean
-    public InMemoryUserDetailsManager userDetailsManager(PasswordEncoder passwordEncoder) {
-        UserDetails user = User.withUsername("test")
-                .password(passwordEncoder.encode("secret"))
-                .roles("USER")
-                .build();
-        return new InMemoryUserDetailsManager(user);
-    }
+//    @Bean
+//    public InMemoryUserDetailsManager userDetailsManager(PasswordEncoder passwordEncoder) {
+//        UserDetails user = User.withUsername("test")
+//                .password(passwordEncoder.encode("secret"))
+//                .roles("USER")
+//                .build();
+//        return new InMemoryUserDetailsManager(user);
+//    }
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {

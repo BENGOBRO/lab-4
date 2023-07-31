@@ -17,7 +17,6 @@ import java.util.Set;
 @Builder
 @ToString
 @NoArgsConstructor
-@RequiredArgsConstructor
 @AllArgsConstructor
 public class Animal {
 
@@ -26,14 +25,13 @@ public class Animal {
     @Column(nullable = false, updatable = false)
     private Long id;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JsonIgnore
-    @Column(nullable = false)
     @ToString.Exclude
-    private Set<AnimalType> animalTypes;
+    private List<AnimalType> animalTypes;
 
     @Transient
-    @JsonProperty("animalTypes")
+    @JsonProperty(value = "animalTypes")
     private List<Long> animalTypesJson;
 
     @Column(nullable = false)
@@ -64,13 +62,12 @@ public class Animal {
     @Column(nullable = false)
     private Long chippingLocationId;
 
-    @ManyToMany
-    @JsonIgnore
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @ToString.Exclude
-    private Set<Location> visitedLocations;
+    private List<Location> visitedLocations;
 
     @Transient
-    @JsonProperty("visitedLocations")
+    @JsonProperty(value = "visitedLocations")
     private List<Long> visitedLocationsJson;
 
     @Temporal(TemporalType.TIMESTAMP)

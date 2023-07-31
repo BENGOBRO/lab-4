@@ -4,11 +4,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -22,10 +20,8 @@ import ru.bengo.animaltracking.model.Message;
 import ru.bengo.animaltracking.repository.AccountRepository;
 import ru.bengo.animaltracking.repository.AnimalRepository;
 import ru.bengo.animaltracking.repository.LocationRepository;
-import ru.bengo.animaltracking.service.AccountService;
 import ru.bengo.animaltracking.service.AnimalService;
 import ru.bengo.animaltracking.service.AnimalTypeService;
-import ru.bengo.animaltracking.service.LocationService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,17 +29,15 @@ import java.util.Optional;
 
 @Service
 @Validated
-@AllArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class AnimalServiceImpl implements AnimalService {
 
-    private AnimalRepository animalRepository;
-    private LocationRepository locationRepository;
-    private AnimalTypeService animalTypeService;
-    private AccountService accountService;
-    private LocationService locationService;
+    private final AnimalRepository animalRepository;
+    private final LocationRepository locationRepository;
+    private final AccountRepository accountRepository;
+    private final AnimalTypeService animalTypeService;
 
     private static final Logger log = LoggerFactory.getLogger(AnimalServiceImpl.class);
-    private final AccountRepository accountRepository;
 
     @Override
     public Animal create(@Valid AnimalDto animalDto) throws AnimalTypesHasDuplicatesException,
