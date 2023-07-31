@@ -18,7 +18,8 @@ public enum Message {
     NO_ACCESS("No rights to access"),
     ANIMAL_DOES_NOT_HAVE_TYPE("Animal type with oldTypeId does not exist for animal with animalId"),
     ANIMAL_TYPES_CONTAIN_NEW_ANIMAL_TYPE("The type of the animal with typeId already exists in the animal with animalId"),
-    ACCOUNT_NOT_FOUND("Account with this id haven't found"),
+    ACCOUNT_NOT_FOUND_GET("GET: Account with this id haven't found"),
+    ACCOUNT_NOT_FOUND_METHOD("Account with this id haven't found"),
     LOCATION_NOT_FOUND("Location with this id haven't found")
     ;
 

@@ -23,6 +23,10 @@ public class AccountControllerAdvice {
 
     @ExceptionHandler(AccountNotFoundException.class)
     public ResponseEntity<?> onAccountNotFoundException(AccountNotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        if (e.getMessage().startsWith("GET")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 }

@@ -59,7 +59,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         Optional<Account> foundAccount = accountRepository.findById(id);
 
         if (foundAccount.isEmpty()) {
-            throw new AccountNotFoundException(Message.ACCOUNT_NOT_FOUND.getInfo());
+            throw new AccountNotFoundException(Message.ACCOUNT_NOT_FOUND_GET.getInfo());
         }
 
         return foundAccount.get();
@@ -72,7 +72,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         Optional<Account> foundAccount = accountRepository.findById(id);
 
         if (foundAccount.isEmpty()) {
-            throw new AccountNotFoundException(Message.ACCOUNT_NOT_FOUND.getInfo());
+            throw new AccountNotFoundException(Message.ACCOUNT_NOT_FOUND_METHOD.getInfo());
         }
         if (!isUserUpdatingTheirAccount(id)) {
             throw new NoAccessException(Message.NO_ACCESS.getInfo());
@@ -92,7 +92,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         Optional<Account> foundAccount = accountRepository.findById(id);
 
         if (foundAccount.isEmpty()) {
-            throw new AccountNotFoundException(Message.ACCOUNT_NOT_FOUND.getInfo());
+            throw new AccountNotFoundException(Message.ACCOUNT_NOT_FOUND_METHOD.getInfo());
         }
 
         String email = foundAccount.get().getEmail();
