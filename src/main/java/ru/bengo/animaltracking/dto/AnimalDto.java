@@ -6,7 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import ru.bengo.animaltracking.annotation.GenderAnnotation;
 import ru.bengo.animaltracking.annotation.LifeStatusAnnotation;
+import ru.bengo.animaltracking.model.Location;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -39,5 +41,9 @@ public record AnimalDto (
 
         @NotNull
         @Positive
-        Long chippingLocationId
+        Long chippingLocationId,
+
+        List<Location> visitedLocations,
+
+        LocalDateTime deathDateTime
 ) {}

@@ -25,7 +25,7 @@ public class Animal {
     @Column(nullable = false, updatable = false)
     private Long id;
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @JsonIgnore
     @ToString.Exclude
     private List<AnimalType> animalTypes;
@@ -62,8 +62,9 @@ public class Animal {
     @Column(nullable = false)
     private Long chippingLocationId;
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @ToString.Exclude
+    @JsonIgnore
     private List<Location> visitedLocations;
 
     @Transient

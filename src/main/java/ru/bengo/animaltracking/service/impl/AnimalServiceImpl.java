@@ -13,10 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import ru.bengo.animaltracking.dto.AnimalDto;
 import ru.bengo.animaltracking.dto.TypeDto;
 import ru.bengo.animaltracking.exception.*;
-import ru.bengo.animaltracking.model.Animal;
-import ru.bengo.animaltracking.model.Gender;
-import ru.bengo.animaltracking.model.LifeStatus;
-import ru.bengo.animaltracking.model.Message;
+import ru.bengo.animaltracking.model.*;
 import ru.bengo.animaltracking.repository.AccountRepository;
 import ru.bengo.animaltracking.repository.AnimalRepository;
 import ru.bengo.animaltracking.repository.LocationRepository;
@@ -24,6 +21,7 @@ import ru.bengo.animaltracking.service.AnimalService;
 import ru.bengo.animaltracking.service.AnimalTypeService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,16 +41,19 @@ public class AnimalServiceImpl implements AnimalService {
     public Animal create(@Valid AnimalDto animalDto) throws AnimalTypesHasDuplicatesException,
             AnimalTypeNotFoundException, ChipperIdNotFoundException, ChippingLocationIdNotFound {
 
-        var animalTypes = animalDto.animalTypes();
+        var animalTypesIds = animalDto.animalTypes();
+        var animalTypes = getAnimalTypes(animalTypesIds);
+
+        List<Long> visitedLocationsIds = new ArrayList<>();
+        visitedLocationsIds.add(animalDto.chippingLocationId());
+        var visitedLocations = getVisitedLocations(visitedLocationsIds);
+
         var chipperId = animalDto.chipperId();
         var chippingLocationId = animalDto.chippingLocationId();
         log.warn("iam here");
 
-        if (hasAnimalTypesDuplicates(animalTypes)) {
+        if (hasAnimalTypesDuplicates(animalTypesIds)) {
             throw new AnimalTypesHasDuplicatesException(Message.ANIMAL_TYPES_HAS_DUPLICATES.getInfo());
-        }
-        if (!isAnimalTypesExist(animalTypes)) {
-            throw new AnimalTypeNotFoundException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo());
         }
         if (!isChipperIdExist(chipperId)) {
             throw new ChipperIdNotFoundException(Message.CHIPPER_ID_NOT_FOUND.getInfo());
@@ -62,7 +63,7 @@ public class AnimalServiceImpl implements AnimalService {
         }
 
         log.warn(">> create animal");
-        Animal animal = convertToEntity(animalDto);
+        Animal animal = convertToEntity(animalDto, animalTypes, visitedLocations);
         return animalRepository.save(animal);
     }
 
@@ -111,8 +112,8 @@ public class AnimalServiceImpl implements AnimalService {
                     Message.NEW_CHIPPING_LOCATION_ID_EQUALS_FIRST_VISITED_LOCATION.getInfo());
         }
 
-        Animal animal = convertToEntity(animalDto);
-        return animalRepository.save(animal);
+        //Animal animal = convertToEntity(animalDto);
+        return animalRepository.save(new Animal());
     }
 
     @Override
@@ -190,17 +191,39 @@ public class AnimalServiceImpl implements AnimalService {
         return null;
     }
 
-    private Animal convertToEntity(AnimalDto animalDto) {
+    private Animal convertToEntity(AnimalDto animalDto, List<AnimalType> animalTypes, List<Location> visitedLocations) {
+        List<Long> visitedLocationsJson = new ArrayList<>();
+        visitedLocationsJson.add(animalDto.chippingLocationId());
+
         return Animal.builder()
-                .animalTypesJson(animalDto.animalTypes())
+                .animalTypes(animalTypes)
                 .weight(animalDto.weight())
                 .length(animalDto.length())
                 .height(animalDto.height())
                 .gender(Gender.valueOf(animalDto.gender()))
                 .chipperId(animalDto.chipperId())
                 .chippingLocationId(animalDto.chippingLocationId())
+                .visitedLocations(visitedLocations)
                 .build();
     }
+
+    private List<AnimalType> getAnimalTypes(List<Long> animalTypesIds) throws AnimalTypeNotFoundException {
+        List<AnimalType> animalTypes = new ArrayList<>();
+        for (Long id : animalTypesIds) {
+            AnimalType animalType = animalTypeService.get(id);
+            animalTypes.add(animalType);
+        }
+        return animalTypes;
+    }
+
+    private List<Location> getVisitedLocations(List<Long> visitedLocationsIds) {
+        List<Location> visitedLocations = new ArrayList<>();
+        for (Long id: visitedLocationsIds) {
+            Location visitedLocation;
+        }
+        return visitedLocations;
+    }
+
     private boolean isDead(LifeStatus lifeStatus) {
         return lifeStatus.name().equals(LifeStatus.DEAD.name());
     }
