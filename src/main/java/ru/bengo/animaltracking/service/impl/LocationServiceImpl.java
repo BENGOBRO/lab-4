@@ -11,7 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import ru.bengo.animaltracking.dto.LocationDto;
 import ru.bengo.animaltracking.exception.LocationAlreadyExistException;
 import ru.bengo.animaltracking.exception.LocationNotFoundException;
-import ru.bengo.animaltracking.model.Location;
+import ru.bengo.animaltracking.entity.Location;
 import ru.bengo.animaltracking.model.Message;
 import ru.bengo.animaltracking.repository.LocationRepository;
 import ru.bengo.animaltracking.service.LocationService;

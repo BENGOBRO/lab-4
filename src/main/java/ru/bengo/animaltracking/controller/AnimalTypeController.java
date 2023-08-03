@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.bengo.animaltracking.dto.AnimalTypeDto;
 import ru.bengo.animaltracking.exception.AnimalTypeAlreadyExist;
 import ru.bengo.animaltracking.exception.AnimalTypeNotFoundException;
-import ru.bengo.animaltracking.model.AnimalType;
+import ru.bengo.animaltracking.entity.AnimalType;
 import ru.bengo.animaltracking.service.AnimalTypeService;
 
 @RestController

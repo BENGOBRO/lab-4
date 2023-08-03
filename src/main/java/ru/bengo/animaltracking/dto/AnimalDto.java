@@ -2,11 +2,8 @@ package ru.bengo.animaltracking.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.Builder;
-import lombok.Data;
 import ru.bengo.animaltracking.annotation.GenderAnnotation;
 import ru.bengo.animaltracking.annotation.LifeStatusAnnotation;
-import ru.bengo.animaltracking.model.Location;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,9 +28,10 @@ public record AnimalDto (
         @GenderAnnotation
         String gender,
 
-        @NotNull
         @LifeStatusAnnotation
         String lifeStatus,
+
+        String chippingDateTime,
 
         @NotNull
         @Positive
@@ -43,7 +41,7 @@ public record AnimalDto (
         @Positive
         Long chippingLocationId,
 
-        List<Location> visitedLocations,
+        List<Long> visitedLocations,
 
-        LocalDateTime deathDateTime
+        String deathDateTime
 ) {}

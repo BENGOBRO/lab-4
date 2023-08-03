@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.bengo.animaltracking.dto.AnimalVisitedLocationDto;
-import ru.bengo.animaltracking.model.AnimalVisitedLocation;
+import ru.bengo.animaltracking.entity.AnimalVisitedLocation;
 import ru.bengo.animaltracking.service.AnimalVisitedLocationService;
 
 import java.time.LocalDateTime;

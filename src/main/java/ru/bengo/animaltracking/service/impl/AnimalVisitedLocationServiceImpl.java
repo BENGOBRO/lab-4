@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.bengo.animaltracking.model.AnimalVisitedLocation;
+import ru.bengo.animaltracking.entity.AnimalVisitedLocation;
 import ru.bengo.animaltracking.repository.AnimalVisitedLocationRepository;
 import ru.bengo.animaltracking.service.AnimalVisitedLocationService;
 

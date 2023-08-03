@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.bengo.animaltracking.dto.AnimalDto;
 import ru.bengo.animaltracking.dto.TypeDto;
 import ru.bengo.animaltracking.exception.*;
-import ru.bengo.animaltracking.model.Animal;
 import ru.bengo.animaltracking.service.AnimalService;
 
 import java.time.LocalDateTime;
@@ -25,18 +24,18 @@ public class AnimalController {
     private static final Logger log = LoggerFactory.getLogger(AnimalController.class);
 
     @PostMapping
-    public ResponseEntity<Animal> createAnimal(@RequestBody AnimalDto animalDto) throws AnimalTypesHasDuplicatesException,
+    public ResponseEntity<AnimalDto> createAnimal(@RequestBody AnimalDto animalDto) throws AnimalTypesHasDuplicatesException,
             ChippingLocationIdNotFound, ChipperIdNotFoundException, AnimalTypeNotFoundException {
         return ResponseEntity.status(HttpStatus.CREATED).body(animalService.create(animalDto));
     }
 
     @GetMapping("/{animalId}")
-    public ResponseEntity<Animal> getAnimal(@PathVariable(value = "animalId") Long id) throws AnimalNotFoundException {
+    public ResponseEntity<AnimalDto> getAnimal(@PathVariable(value = "animalId") Long id) throws AnimalNotFoundException {
         return ResponseEntity.ok(animalService.get(id));
     }
 
     @PutMapping("/{animalId}")
-    public ResponseEntity<Animal> updateAnimal(@PathVariable("animalId") Long id,
+    public ResponseEntity<AnimalDto> updateAnimal(@PathVariable("animalId") Long id,
                                                @RequestBody AnimalDto animalDto) throws AnimalNotFoundException,
             NewChippingLocationIdEqualsFirstVisitedLocationIdException,
             UpdateDeadToAliveException, ChippingLocationIdNotFound, ChipperIdNotFoundException {
@@ -50,7 +49,7 @@ public class AnimalController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Animal>> searchAnimals(@RequestParam(required = false)
+    public ResponseEntity<List<AnimalDto>> searchAnimals(@RequestParam(required = false)
                                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
                                                       @RequestParam(required = false)
                                                       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDateTime,
@@ -65,14 +64,14 @@ public class AnimalController {
     }
 
     @PostMapping("/{animalId}/types/{typeId}")
-    public ResponseEntity<Animal> addAnimalTypeToAnimal(@PathVariable("animalId") Long animalId,
+    public ResponseEntity<AnimalDto> addAnimalTypeToAnimal(@PathVariable("animalId") Long animalId,
                                                         @PathVariable("typeId") Long typeId) throws AnimalNotFoundException,
             AnimalTypesContainNewAnimalTypeException, AnimalTypeNotFoundException {
         return ResponseEntity.ok(animalService.addAnimalTypeToAnimal(animalId, typeId));
     }
 
     @PutMapping("/{animalId}/types")
-    public ResponseEntity<Animal> updateAnimalTypeInAnimal(@PathVariable("animalId") Long animalId,
+    public ResponseEntity<AnimalDto> updateAnimalTypeInAnimal(@PathVariable("animalId") Long animalId,
                                                            @RequestBody TypeDto typeDto) throws AnimalNotFoundException,
             AnimalTypeAlreadyExist, AnimalTypeNotFoundException, AnimalDoesNotHaveTypeException {
         return ResponseEntity.ok(animalService.updateAnimalTypesInAnimal(animalId, typeDto));

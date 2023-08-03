@@ -11,7 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import ru.bengo.animaltracking.dto.AnimalTypeDto;
 import ru.bengo.animaltracking.exception.AnimalTypeAlreadyExist;
 import ru.bengo.animaltracking.exception.AnimalTypeNotFoundException;
-import ru.bengo.animaltracking.model.AnimalType;
+import ru.bengo.animaltracking.entity.AnimalType;
 import ru.bengo.animaltracking.model.Message;
 import ru.bengo.animaltracking.repository.AnimalTypeRepository;
 import ru.bengo.animaltracking.service.AnimalTypeService;

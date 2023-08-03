@@ -6,9 +6,7 @@ import jakarta.validation.constraints.Positive;
 import ru.bengo.animaltracking.dto.AnimalTypeDto;
 import ru.bengo.animaltracking.exception.AnimalTypeAlreadyExist;
 import ru.bengo.animaltracking.exception.AnimalTypeNotFoundException;
-import ru.bengo.animaltracking.model.AnimalType;
-
-import java.util.Optional;
+import ru.bengo.animaltracking.entity.AnimalType;
 
 public interface AnimalTypeService {
     AnimalType create(@Valid AnimalTypeDto animalType) throws AnimalTypeAlreadyExist;

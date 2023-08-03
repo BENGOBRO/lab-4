@@ -3,7 +3,7 @@ package ru.bengo.animaltracking.repository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import ru.bengo.animaltracking.model.Account;
+import ru.bengo.animaltracking.entity.Account;
 
 import java.util.List;
 import java.util.Optional;

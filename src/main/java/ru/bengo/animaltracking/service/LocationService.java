@@ -6,9 +6,7 @@ import jakarta.validation.constraints.Positive;
 import ru.bengo.animaltracking.dto.LocationDto;
 import ru.bengo.animaltracking.exception.LocationAlreadyExistException;
 import ru.bengo.animaltracking.exception.LocationNotFoundException;
-import ru.bengo.animaltracking.model.Location;
-
-import java.util.Optional;
+import ru.bengo.animaltracking.entity.Location;
 
 public interface LocationService {
     Location create(@Valid LocationDto locationDto) throws LocationAlreadyExistException;

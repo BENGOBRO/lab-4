@@ -3,8 +3,7 @@ package ru.bengo.animaltracking.repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import ru.bengo.animaltracking.model.Animal;
-import ru.bengo.animaltracking.model.AnimalVisitedLocation;
+import ru.bengo.animaltracking.entity.AnimalVisitedLocation;
 
 import java.time.LocalDateTime;
 import java.util.List;

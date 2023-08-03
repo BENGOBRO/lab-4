@@ -2,7 +2,7 @@ package ru.bengo.animaltracking.service;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
-import ru.bengo.animaltracking.model.AnimalVisitedLocation;
+import ru.bengo.animaltracking.entity.AnimalVisitedLocation;
 
 import java.time.LocalDateTime;
 import java.util.List;

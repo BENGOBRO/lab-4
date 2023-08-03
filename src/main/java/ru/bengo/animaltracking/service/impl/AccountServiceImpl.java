@@ -20,7 +20,7 @@ import ru.bengo.animaltracking.dto.AccountDto;
 import ru.bengo.animaltracking.exception.AccountNotFoundException;
 import ru.bengo.animaltracking.exception.NoAccessException;
 import ru.bengo.animaltracking.exception.UserAlreadyExistException;
-import ru.bengo.animaltracking.model.Account;
+import ru.bengo.animaltracking.entity.Account;
 import ru.bengo.animaltracking.model.Message;
 import ru.bengo.animaltracking.model.User;
 import ru.bengo.animaltracking.repository.AccountRepository;

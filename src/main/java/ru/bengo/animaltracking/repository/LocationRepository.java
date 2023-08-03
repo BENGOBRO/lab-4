@@ -2,7 +2,7 @@ package ru.bengo.animaltracking.repository;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import ru.bengo.animaltracking.model.Location;
+import ru.bengo.animaltracking.entity.Location;
 
 import java.util.Optional;
 

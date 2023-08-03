@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import ru.bengo.animaltracking.dto.AccountDto;
 import ru.bengo.animaltracking.exception.UserAlreadyExistException;
-import ru.bengo.animaltracking.model.Account;
+import ru.bengo.animaltracking.entity.Account;
 import ru.bengo.animaltracking.service.AccountService;
 
 @RestController

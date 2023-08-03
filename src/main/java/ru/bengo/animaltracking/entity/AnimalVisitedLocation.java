@@ -1,4 +1,4 @@
-package ru.bengo.animaltracking.model;
+package ru.bengo.animaltracking.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;

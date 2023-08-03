@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.bengo.animaltracking.dto.LocationDto;
 import ru.bengo.animaltracking.exception.LocationAlreadyExistException;
 import ru.bengo.animaltracking.exception.LocationNotFoundException;
-import ru.bengo.animaltracking.model.Location;
+import ru.bengo.animaltracking.entity.Location;
 import ru.bengo.animaltracking.service.LocationService;
 
 @RestController

@@ -8,10 +8,9 @@ import ru.bengo.animaltracking.dto.AccountDto;
 import ru.bengo.animaltracking.exception.AccountNotFoundException;
 import ru.bengo.animaltracking.exception.NoAccessException;
 import ru.bengo.animaltracking.exception.UserAlreadyExistException;
-import ru.bengo.animaltracking.model.Account;
+import ru.bengo.animaltracking.entity.Account;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface AccountService {
     Account get(@NotNull @Positive Integer id) throws AccountNotFoundException;

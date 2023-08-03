@@ -1,14 +1,13 @@
-package ru.bengo.animaltracking.model;
+package ru.bengo.animaltracking.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import ru.bengo.animaltracking.model.Gender;
+import ru.bengo.animaltracking.model.LifeStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "animals")
@@ -26,13 +25,8 @@ public class Animal {
     private Long id;
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
-    @JsonIgnore
     @ToString.Exclude
     private List<AnimalType> animalTypes;
-
-    @Transient
-    @JsonProperty(value = "animalTypes")
-    private List<Long> animalTypesJson;
 
     @Column(nullable = false)
     private Double weight;
@@ -64,12 +58,7 @@ public class Animal {
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @ToString.Exclude
-    @JsonIgnore
     private List<Location> visitedLocations;
-
-    @Transient
-    @JsonProperty(value = "visitedLocations")
-    private List<Long> visitedLocationsJson;
 
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime deathDateTime;
