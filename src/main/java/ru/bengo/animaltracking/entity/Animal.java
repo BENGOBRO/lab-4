@@ -2,11 +2,10 @@ package ru.bengo.animaltracking.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
 import ru.bengo.animaltracking.model.Gender;
 import ru.bengo.animaltracking.model.LifeStatus;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -45,10 +44,8 @@ public class Animal {
     @Column(nullable = false)
     private LifeStatus lifeStatus;
 
-    @CreatedDate
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
-    private LocalDateTime chippingDateTime;
+    private Date chippingDateTime;
 
     @Column(nullable = false)
     private Integer chipperId;
@@ -60,19 +57,18 @@ public class Animal {
     @ToString.Exclude
     private List<Location> visitedLocations;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime deathDateTime;
+    private Date deathDateTime;
 
     @PrePersist
     void onCreate() {
         this.lifeStatus = LifeStatus.ALIVE;
-        this.chippingDateTime = LocalDateTime.now();
+        this.chippingDateTime = new Date();
     }
 
     @PreUpdate
     void onUpdate() {
         if (this.lifeStatus.equals(LifeStatus.DEAD)) {
-            this.deathDateTime = LocalDateTime.now();
+            this.deathDateTime = new Date();
         }
     }
 }

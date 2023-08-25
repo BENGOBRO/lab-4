@@ -51,7 +51,6 @@ public class AnimalServiceImpl implements AnimalService {
 
         var chipperId = animalDto.chipperId();
         var chippingLocationId = animalDto.chippingLocationId();
-        log.warn("iam here");
 
         if (hasAnimalTypesDuplicates(animalTypesIds)) {
             throw new AnimalTypesHasDuplicatesException(Message.ANIMAL_TYPES_HAS_DUPLICATES.getInfo());
@@ -63,7 +62,6 @@ public class AnimalServiceImpl implements AnimalService {
             throw new ChippingLocationIdNotFound(Message.CHIPPING_LOCATION_ID_NOT_FOUND.getInfo());
         }
 
-        log.warn(">> create animal");
         Animal animal = animalRepository.save(convertToEntity(animalDto, animalTypes, visitedLocations));
 
         return convertToDto(animal, animalTypesIds, visitedLocationsIds);
@@ -235,14 +233,6 @@ public class AnimalServiceImpl implements AnimalService {
     }
 
     private AnimalDto convertToDto(Animal animal, List<Long> animalTypes, List<Long> visitedLocations) {
-        LocalDateTime deathDateTime = animal.getDeathDateTime();
-        String deathDateTimeStr;
-        if (deathDateTime == null) {
-            deathDateTimeStr = null;
-        } else {
-            deathDateTimeStr = deathDateTime.toString();
-        }
-
         return new AnimalDto(
                 animalTypes,
                 animal.getWeight(),
@@ -250,11 +240,11 @@ public class AnimalServiceImpl implements AnimalService {
                 animal.getHeight(),
                 animal.getGender().name(),
                 animal.getLifeStatus().name(),
-                animal.getChippingDateTime().toString(),
+                animal.getChippingDateTime(),
                 animal.getChipperId(),
                 animal.getChippingLocationId(),
                 visitedLocations,
-                deathDateTimeStr
+                animal.getDeathDateTime()
         );
     }
 
