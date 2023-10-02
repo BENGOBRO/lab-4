@@ -1,24 +1,39 @@
 package ru.bengo.animaltracking.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import org.springframework.data.annotation.CreatedDate;
+import lombok.*;
+import ru.bengo.animaltracking.dto.AnimalDto;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
-@Data
 @Entity
+@Table(name = "animal_visited_locations")
+@Getter
+@Setter
+@Builder
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 public class AnimalVisitedLocation {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
     private Long id;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @CreatedDate
-    private LocalDateTime dateTimeOfVisitLocationPoint;
+    @ManyToOne
+    @JoinColumn(name = "animal")
+    private Animal animal;
 
-    private Long locationPointId;
+    @Column(nullable = false)
+    private Date dateTimeOfVisitLocationPoint;
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "location_id", nullable = false)
+    private Location location;
 
+    @PrePersist
+    void onCreate() {
+        this.dateTimeOfVisitLocationPoint = new Date();
+    }
 }

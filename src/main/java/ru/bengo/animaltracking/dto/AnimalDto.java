@@ -1,65 +1,63 @@
 package ru.bengo.animaltracking.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
+import lombok.Data;
 import ru.bengo.animaltracking.annotation.GenderAnnotation;
 import ru.bengo.animaltracking.annotation.LifeStatusAnnotation;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
 
-public record AnimalDto (
+@Data
+public class AnimalDto {
+        private Long id;
+
         @JsonProperty("animalTypes")
-//        @NotNull
-//        @Min(1)
-        List<Long> animalTypes,
+        private List<Long> animalTypes;
 
         @NotNull
         @Positive
         @JsonProperty("weight")
-        Double weight,
+        private Double weight;
 
         @NotNull
         @Positive
         @JsonProperty("length")
-        Double length,
+        private Double length;
 
         @NotNull
         @Positive
         @JsonProperty("height")
-        Double height,
+        private Double height;
 
         @NotNull
         @GenderAnnotation
         @JsonProperty("gender")
-        String gender,
+        private String gender;
 
         @LifeStatusAnnotation
         @JsonProperty("lifeStatus")
-        String lifeStatus,
+        private String lifeStatus;
 
         @JsonProperty("chippingDateTime")
-        Date chippingDateTime,
+        private Date chippingDateTime;
 
         @NotNull
         @Positive
         @JsonProperty("chipperId")
-        Integer chipperId,
+        private Integer chipperId;
 
         @NotNull
         @Positive
         @JsonProperty("chippingLocationId")
-        Long chippingLocationId,
+        private Long chippingLocationId;
 
         @JsonProperty("visitedLocations")
-        List<Long> visitedLocations,
+        private List<Long> visitedLocations;
 
         @JsonProperty("deathDateTime")
-        Date deathDateTime
-) {}
+        private Date deathDateTime;
+}

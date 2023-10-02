@@ -24,7 +24,7 @@ public class AccountController {
         return ResponseEntity.ok(accountService.get(id));
     }
 
-        @PutMapping("/{accountId}")
+    @PutMapping("/{accountId}")
     public ResponseEntity<Account> updateAccount(@RequestBody AccountDto accountDto,
                                                @PathVariable("accountId") Integer id) throws UserAlreadyExistException, NoAccessException, AccountNotFoundException {
         return ResponseEntity.ok(accountService.update(accountDto, id));

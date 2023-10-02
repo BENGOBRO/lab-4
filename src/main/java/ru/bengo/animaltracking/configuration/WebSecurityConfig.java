@@ -6,15 +6,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import ru.bengo.animaltracking.configuration.filter.UserAuthenticatedFilter;
 
 @Configuration
@@ -23,15 +18,6 @@ import ru.bengo.animaltracking.configuration.filter.UserAuthenticatedFilter;
 public class WebSecurityConfig {
 
     private final UserAuthenticatedFilter userAuthenticatedFilter;
-
-//    @Bean
-//    public InMemoryUserDetailsManager userDetailsManager(PasswordEncoder passwordEncoder) {
-//        UserDetails user = User.withUsername("test")
-//                .password(passwordEncoder.encode("secret"))
-//                .roles("USER")
-//                .build();
-//        return new InMemoryUserDetailsManager(user);
-//    }
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -42,10 +28,11 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .addFilterAfter(userAuthenticatedFilter, BasicAuthenticationFilter.class)
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/registration")
+                        .requestMatchers(
+                                AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/registration"),
+                                AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/error"))
                         .permitAll()
                         .requestMatchers(HttpMethod.GET,
                                 "/accounts/**",
@@ -55,8 +42,6 @@ public class WebSecurityConfig {
                         .permitAll()
                         .anyRequest().authenticated())
                 .httpBasic();
-
-
         return http.build();
     }
 }

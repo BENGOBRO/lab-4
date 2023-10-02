@@ -53,9 +53,9 @@ public class Animal {
     @Column(nullable = false)
     private Long chippingLocationId;
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @OneToMany(mappedBy = "animal")
     @ToString.Exclude
-    private List<Location> visitedLocations;
+    private List<AnimalVisitedLocation> visitedLocations;
 
     private Date deathDateTime;
 

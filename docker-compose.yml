@@ -20,9 +20,9 @@ services:
     depends_on:
       - database
     environment:
-      - spring.datasource.url=jdbc:postgresql://database:5432/animal_tracking
+      - spring.datasource.url=jdbc:postgresql://database:5432/animal-tracking
       - spring.datasource.username=postgres
-      - spring.datasource.password=DznStilton1.
+      - spring.datasource.password=postgres
       - spring.jpa.hibernate.ddl-auto=create-drop
       - server.port=8080
 

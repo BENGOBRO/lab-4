@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
 public record LocationDto (
+        Long id,
+
         @NotNull
         @Min(-90)
         @Max(90)

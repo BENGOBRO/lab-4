@@ -18,7 +18,6 @@ import ru.bengo.animaltracking.service.AnimalTypeService;
 public class AnimalTypeController {
 
     private final AnimalTypeService animalTypeService;
-    private static final Logger log = LoggerFactory.getLogger(AnimalTypeController.class);
 
     @PostMapping
     public ResponseEntity<AnimalType> createAnimalType(@RequestBody AnimalTypeDto animalTypeDto) throws AnimalTypeAlreadyExist {

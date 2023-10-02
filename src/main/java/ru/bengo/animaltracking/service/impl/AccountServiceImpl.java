@@ -118,18 +118,16 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<Account> foundAccount = accountRepository.findAccountByEmail(username);
 
-        if (foundAccount.isPresent()) {
-            return new User(foundAccount.get());
+        if (foundAccount.isEmpty()) {
+            throw new UsernameNotFoundException(username);
         }
 
-        throw new UsernameNotFoundException(username);
+        return new User(foundAccount.get());
     }
 
     private boolean isEmailExist(String email) {
-
         Optional<Account> foundAccount = accountRepository.findAccountByEmail(email);
         return foundAccount.isPresent();
-
     }
 
     private boolean isEmailExist(String email, Integer id) {
