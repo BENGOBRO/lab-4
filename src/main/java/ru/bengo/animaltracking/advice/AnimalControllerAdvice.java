@@ -19,16 +19,6 @@ public class AnimalControllerAdvice {
         return ResponseEntity.notFound().build();
     }
 
-    @ExceptionHandler(ChipperIdNotFoundException.class)
-    public ResponseEntity<?> onChipperIdNotFoundException(ChipperIdNotFoundException e) {
-        return ResponseEntity.notFound().build();
-    }
-
-    @ExceptionHandler(ChippingLocationIdNotFound.class)
-    public ResponseEntity<?> onChippingLocationIdNotFoundException(ChipperIdNotFoundException e) {
-        return ResponseEntity.notFound().build();
-    }
-
     @ExceptionHandler(AnimalNotFoundException.class)
     public ResponseEntity<?> onAnimalNotFoundException(AnimalNotFoundException e) {
         return ResponseEntity.notFound().build();

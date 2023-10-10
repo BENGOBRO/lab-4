@@ -5,19 +5,15 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.bengo.animaltracking.dto.LocationDto;
+import ru.bengo.animaltracking.entity.Location;
 import ru.bengo.animaltracking.exception.LocationAlreadyExistException;
 import ru.bengo.animaltracking.exception.LocationNotFoundException;
-import ru.bengo.animaltracking.entity.Location;
 import ru.bengo.animaltracking.model.Message;
 import ru.bengo.animaltracking.repository.LocationRepository;
 import ru.bengo.animaltracking.service.LocationService;
-
-import java.util.Optional;
 
 @Service
 @Validated
@@ -38,22 +34,15 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public Location get(@NotNull @Positive Long id) throws LocationNotFoundException {
-        Optional<Location> foundLocation = locationRepository.findById(id);
-
-        if (foundLocation.isEmpty()) {
-            throw new LocationNotFoundException(Message.LOCATION_NOT_FOUND.getInfo());
-        }
-
-        return foundLocation.get();
+        return locationRepository.findById(id)
+                .orElseThrow(() -> new LocationNotFoundException(Message.LOCATION_NOT_FOUND.getInfo()));
     }
 
     @Override
     public Location update(@Valid LocationDto locationDto, @NotNull @Positive Long id) throws LocationAlreadyExistException, LocationNotFoundException {
-        Optional<Location> foundLocation = locationRepository.findById(id);
+        locationRepository.findById(id)
+                .orElseThrow(() -> new LocationNotFoundException(Message.LOCATION_NOT_FOUND.getInfo()));
 
-        if (foundLocation.isEmpty()) {
-            throw new LocationNotFoundException(Message.LOCATION_NOT_FOUND.getInfo());
-        }
         if (isLocationWithLatitudeAndLongitudeExist(locationDto.latitude(), locationDto.longitude())) {
             throw new LocationAlreadyExistException(Message.LOCATION_EXIST.getInfo());
         }
@@ -65,12 +54,8 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public void delete(@NotNull @Positive Long id) throws LocationNotFoundException {
-        Optional<Location> foundLocation = locationRepository.findById(id);
-        log.warn("HERE");
-
-        if (foundLocation.isEmpty()) {
-            throw new LocationNotFoundException(Message.LOCATION_NOT_FOUND.getInfo());
-        }
+        locationRepository.findById(id)
+                .orElseThrow(() -> new LocationNotFoundException(Message.LOCATION_NOT_FOUND.getInfo()));
 
         locationRepository.deleteById(id);
     }

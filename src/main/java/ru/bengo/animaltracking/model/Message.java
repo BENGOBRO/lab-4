@@ -1,7 +1,9 @@
 package ru.bengo.animaltracking.model;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+@Getter
 @RequiredArgsConstructor
 public enum Message {
     ACCOUNT_EXIST("There is an account with that email address"),
@@ -16,8 +18,6 @@ public enum Message {
     UPDATE_DEAD_TO_ALIVE("This animal is already dead"),
     NEW_CHIPPING_LOCATION_ID_EQUALS_FIRST_VISITED_LOCATION("New chipping location id equals first visited location id"),
     NO_ACCESS("No rights to access"),
-    ANIMAL_DOES_NOT_HAVE_TYPE("Animal type with oldTypeId does not exist for animal with animalId"),
-    ANIMAL_TYPES_CONTAIN_NEW_ANIMAL_TYPE("The type of the animal with typeId already exists in the animal with animalId"),
     ACCOUNT_NOT_FOUND_GET("GET: Account with this id haven't found"),
     ACCOUNT_NOT_FOUND_METHOD("Account with this id haven't found"),
     LOCATION_NOT_FOUND("Location with this id haven't found")
@@ -25,7 +25,4 @@ public enum Message {
 
     private final String info;
 
-    public String getInfo() {
-        return info;
-    }
 }

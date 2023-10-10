@@ -18,4 +18,5 @@ public interface AnimalVisitedLocationRepository extends CrudRepository<AnimalVi
             "order by id", nativeQuery = true)
     List<AnimalVisitedLocation> search(Date startDateTime, Date endDateTime);
 
+    void deleteAnimalVisitedLocationByAnimal_IdAndLocation_Id(Long animalId, Long locationId);
 }

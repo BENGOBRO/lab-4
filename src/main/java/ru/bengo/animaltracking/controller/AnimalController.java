@@ -19,7 +19,11 @@ import ru.bengo.animaltracking.exception.*;
 import ru.bengo.animaltracking.service.AnimalService;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/animals")
@@ -32,7 +36,7 @@ public class AnimalController {
 
     @PostMapping
     public ResponseEntity<AnimalDto> createAnimal(@RequestBody AnimalDto animalDto) throws AnimalTypesHasDuplicatesException,
-            ChippingLocationIdNotFound, ChipperIdNotFoundException, AnimalTypeNotFoundException {
+            AnimalTypeNotFoundException, AccountNotFoundException, LocationNotFoundException {
         return ResponseEntity.status(HttpStatus.CREATED).body(convertToDto(animalService.create(animalDto)));
     }
 
@@ -45,7 +49,7 @@ public class AnimalController {
     public ResponseEntity<AnimalDto> updateAnimal(@PathVariable("animalId") Long id,
                                                @RequestBody AnimalDto animalDto) throws AnimalNotFoundException,
             NewChippingLocationIdEqualsFirstVisitedLocationIdException,
-            UpdateDeadToAliveException, ChippingLocationIdNotFound, ChipperIdNotFoundException, LocationNotFoundException, AnimalTypeNotFoundException {
+            UpdateDeadToAliveException, LocationNotFoundException, AnimalTypeNotFoundException, AccountNotFoundException {
         return ResponseEntity.ok(convertToDto(animalService.update(id, animalDto)));
     }
 
@@ -87,14 +91,7 @@ public class AnimalController {
 
     private AnimalDto convertToDto(Animal animal) {
         List<Long> animalTypes = animal.getAnimalTypes().stream().map(AnimalType::getId).toList();
-        List<Long> visitedLocations = animal.getVisitedLocations().stream().map(AnimalVisitedLocation::getId).toList();
-//        TypeMap<Animal, AnimalDto> propertyMapper = modelMapper.createTypeMap(Animal.class, AnimalDto.class);
-//        propertyMapper.addMappings(
-//                modelMapper -> modelMapper.skip(AnimalDto::setAnimalTypes)
-//        );
-//        propertyMapper.addMappings(
-//                modelMapper -> modelMapper.map(Animal::getChipperId, AnimalDto::setChipperId)
-//        );
+        List<Long> visitedLocations = Optional.ofNullable(animal.getVisitedLocations()).orElse(new ArrayList<>()).stream().map(AnimalVisitedLocation::getId).toList();
         AnimalDto animalDto = modelMapper.map(animal, AnimalDto.class);
         animalDto.setAnimalTypes(animalTypes);
         animalDto.setVisitedLocations(visitedLocations);

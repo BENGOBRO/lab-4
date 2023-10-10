@@ -15,13 +15,13 @@ import java.util.List;
 public interface AnimalService {
     Animal create(@Valid AnimalDto animalDto)
             throws AnimalTypesHasDuplicatesException, AnimalTypeNotFoundException,
-            ChipperIdNotFoundException, ChippingLocationIdNotFound;
+             AccountNotFoundException, LocationNotFoundException;
 
     Animal get(@NotNull @Positive Long id) throws AnimalNotFoundException;
 
     Animal update(@NotNull @Positive Long id, @Valid AnimalDto animal) throws AnimalNotFoundException,
-            UpdateDeadToAliveException, ChipperIdNotFoundException, ChippingLocationIdNotFound,
-            NewChippingLocationIdEqualsFirstVisitedLocationIdException, LocationNotFoundException, AnimalTypeNotFoundException;
+            UpdateDeadToAliveException,
+            NewChippingLocationIdEqualsFirstVisitedLocationIdException, LocationNotFoundException, AnimalTypeNotFoundException, AccountNotFoundException;
 
     void delete(@NotNull @Positive Long id) throws AnimalNotFoundException;
 

@@ -5,8 +5,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,10 +15,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.bengo.animaltracking.dto.AccountDto;
+import ru.bengo.animaltracking.entity.Account;
 import ru.bengo.animaltracking.exception.AccountNotFoundException;
 import ru.bengo.animaltracking.exception.NoAccessException;
 import ru.bengo.animaltracking.exception.UserAlreadyExistException;
-import ru.bengo.animaltracking.entity.Account;
 import ru.bengo.animaltracking.model.Message;
 import ru.bengo.animaltracking.model.User;
 import ru.bengo.animaltracking.repository.AccountRepository;
@@ -38,8 +36,6 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
     private final BCryptPasswordEncoder passwordEncoder;
 
-    private static final Logger log = LoggerFactory.getLogger(AccountServiceImpl.class);
-
     @Override
     public Account register(@Valid AccountDto accountDto) throws UserAlreadyExistException{
         String email = accountDto.email();
@@ -55,24 +51,17 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
     @Override
     public Account get(@NotNull @Positive Integer id) throws AccountNotFoundException {
-        Optional<Account> foundAccount = accountRepository.findById(id);
-
-        if (foundAccount.isEmpty()) {
-            throw new AccountNotFoundException(Message.ACCOUNT_NOT_FOUND_GET.getInfo());
-        }
-
-        return foundAccount.get();
+        return accountRepository.findById(id)
+                .orElseThrow(() -> new AccountNotFoundException(Message.ACCOUNT_NOT_FOUND_GET.getInfo()));
     }
 
 
     @Override
     public Account update(@Valid AccountDto accountDto,@NotNull @Positive Integer id) throws UserAlreadyExistException, NoAccessException, AccountNotFoundException {
         String email = accountDto.email();
-        Optional<Account> foundAccount = accountRepository.findById(id);
+        accountRepository.findById(id)
+                .orElseThrow(() -> new AccountNotFoundException(Message.ACCOUNT_NOT_FOUND_METHOD.getInfo()));
 
-        if (foundAccount.isEmpty()) {
-            throw new AccountNotFoundException(Message.ACCOUNT_NOT_FOUND_METHOD.getInfo());
-        }
         if (!isUserUpdatingTheirAccount(id)) {
             throw new NoAccessException(Message.NO_ACCESS.getInfo());
         }
@@ -88,13 +77,8 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
     @Override
     public void delete(@NotNull @Positive Integer id) throws NoAccessException, AccountNotFoundException {
-        Optional<Account> foundAccount = accountRepository.findById(id);
-
-        if (foundAccount.isEmpty()) {
-            throw new AccountNotFoundException(Message.ACCOUNT_NOT_FOUND_METHOD.getInfo());
-        }
-
-        String email = foundAccount.get().getEmail();
+        accountRepository.findById(id)
+                .orElseThrow(() -> new AccountNotFoundException(Message.ACCOUNT_NOT_FOUND_METHOD.getInfo()));
 
         if (!isUserUpdatingTheirAccount(id)) {
             throw new NoAccessException(Message.NO_ACCESS.getInfo());

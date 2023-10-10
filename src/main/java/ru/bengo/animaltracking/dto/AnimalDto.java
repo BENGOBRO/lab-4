@@ -1,6 +1,7 @@
 package ru.bengo.animaltracking.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
@@ -16,6 +17,7 @@ public class AnimalDto {
         private Long id;
 
         @JsonProperty("animalTypes")
+        @NotEmpty
         private List<Long> animalTypes;
 
         @NotNull

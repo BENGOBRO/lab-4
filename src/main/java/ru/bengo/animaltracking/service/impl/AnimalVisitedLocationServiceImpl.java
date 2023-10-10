@@ -33,10 +33,9 @@ public class AnimalVisitedLocationServiceImpl implements AnimalVisitedLocationSe
     private final AnimalService animalService;
 
     @Override
-    public AnimalVisitedLocation create(@NotNull @Positive Long animalId, @NotNull @Positive Long pointId) throws LocationNotFoundException, AnimalNotFoundException {
-        Location visitedLocation = locationService.get(pointId);
+    public AnimalVisitedLocation create(@NotNull @Positive Long animalId, @NotNull @Positive Long locationId) throws LocationNotFoundException, AnimalNotFoundException {
+        Location visitedLocation = locationService.get(locationId);
         Animal animal = animalService.get(animalId);
-        log.warn("HERE");
         return animalVisitedLocationRepository.save(convertToEntity(visitedLocation, animal));
     }
 
@@ -54,8 +53,8 @@ public class AnimalVisitedLocationServiceImpl implements AnimalVisitedLocationSe
     }
 
     @Override
-    public void delete(Long animalId, Long visitedPointId) {
-
+    public void delete(Long animalId, Long locationId) {
+        animalVisitedLocationRepository.deleteAnimalVisitedLocationByAnimal_IdAndLocation_Id(animalId, locationId);
     }
 
     private AnimalVisitedLocation convertToEntity(Location locationPoint, Animal animal) {
