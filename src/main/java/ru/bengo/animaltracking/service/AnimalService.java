@@ -13,25 +13,20 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AnimalService {
-    Animal create(@Valid AnimalDto animalDto)
-            throws AnimalTypesHasDuplicatesException, AnimalTypeNotFoundException,
-             AccountNotFoundException, LocationNotFoundException;
+    Animal create(@Valid AnimalDto animalDto) throws ConflictException, NotFoundException;
 
-    Animal get(@NotNull @Positive Long id) throws AnimalNotFoundException;
+    Animal get(@NotNull @Positive Long id) throws NotFoundException;
 
-    Animal update(@NotNull @Positive Long id, @Valid AnimalDto animal) throws AnimalNotFoundException,
-            UpdateDeadToAliveException,
-            NewChippingLocationIdEqualsFirstVisitedLocationIdException, LocationNotFoundException, AnimalTypeNotFoundException, AccountNotFoundException;
+    Animal update(@NotNull @Positive Long id, @Valid AnimalDto animal) throws NotFoundException, BadRequestException;
 
-    void delete(@NotNull @Positive Long id) throws AnimalNotFoundException;
+    void delete(@NotNull @Positive Long id) throws NotFoundException;
 
     List<Animal> search(LocalDateTime startDateTime, LocalDateTime endDateTime,
                         @Positive Integer chipperId, @Positive Long chippingLocationId,
                         String lifeStatus, String gender,
                         @Min(0) Integer from, @Min(1) Integer size);
 
-    Animal addAnimalTypeToAnimal(@NotNull @Positive Long animalId, @NotNull @Positive Long typeId) throws AnimalNotFoundException,
-            AnimalTypeNotFoundException, AnimalTypesContainNewAnimalTypeException;
+    Animal addAnimalTypeToAnimal(@NotNull @Positive Long animalId, @NotNull @Positive Long typeId);
 
-    Animal updateAnimalTypesInAnimal(@NotNull @Positive Long animalId, @Valid TypeDto typeDto) throws AnimalNotFoundException, AnimalTypeNotFoundException, AnimalDoesNotHaveTypeException, AnimalTypeAlreadyExist;
+    Animal updateAnimalTypesInAnimal(@NotNull @Positive Long animalId, @Valid TypeDto typeDto);
 }

@@ -47,11 +47,13 @@ public class Animal {
     @Column(nullable = false)
     private Date chippingDateTime;
 
-    @Column(nullable = false)
-    private Integer chipperId;
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Account chipper;
 
-    @Column(nullable = false)
-    private Long chippingLocationId;
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Location chippingLocation;
 
     @OneToMany(mappedBy = "animal")
     @ToString.Exclude

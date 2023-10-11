@@ -35,26 +35,23 @@ public class AnimalController {
     private final ModelMapper modelMapper;
 
     @PostMapping
-    public ResponseEntity<AnimalDto> createAnimal(@RequestBody AnimalDto animalDto) throws AnimalTypesHasDuplicatesException,
-            AnimalTypeNotFoundException, AccountNotFoundException, LocationNotFoundException {
+    public ResponseEntity<AnimalDto> createAnimal(@RequestBody AnimalDto animalDto) throws ConflictException, NotFoundException {
         return ResponseEntity.status(HttpStatus.CREATED).body(convertToDto(animalService.create(animalDto)));
     }
 
     @GetMapping("/{animalId}")
-    public ResponseEntity<AnimalDto> getAnimal(@PathVariable(value = "animalId") Long id) throws AnimalNotFoundException {
+    public ResponseEntity<AnimalDto> getAnimal(@PathVariable(value = "animalId") Long id) throws NotFoundException {
         return ResponseEntity.ok(convertToDto(animalService.get(id)));
     }
 
     @PutMapping("/{animalId}")
     public ResponseEntity<AnimalDto> updateAnimal(@PathVariable("animalId") Long id,
-                                               @RequestBody AnimalDto animalDto) throws AnimalNotFoundException,
-            NewChippingLocationIdEqualsFirstVisitedLocationIdException,
-            UpdateDeadToAliveException, LocationNotFoundException, AnimalTypeNotFoundException, AccountNotFoundException {
+                                               @RequestBody AnimalDto animalDto) throws NotFoundException, BadRequestException {
         return ResponseEntity.ok(convertToDto(animalService.update(id, animalDto)));
     }
 
     @DeleteMapping("/{animalId}")
-    public ResponseEntity<?> deleteAnimal(@PathVariable("animalId") Long id) throws AnimalNotFoundException {
+    public ResponseEntity<?> deleteAnimal(@PathVariable("animalId") Long id) throws NotFoundException {
         animalService.delete(id);
         return ResponseEntity.ok().build();
     }
@@ -77,15 +74,13 @@ public class AnimalController {
 
     @PostMapping("/{animalId}/types/{typeId}")
     public ResponseEntity<AnimalDto> addAnimalTypeToAnimal(@PathVariable("animalId") Long animalId,
-                                                        @PathVariable("typeId") Long typeId) throws AnimalNotFoundException,
-            AnimalTypesContainNewAnimalTypeException, AnimalTypeNotFoundException {
+                                                        @PathVariable("typeId") Long typeId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(convertToDto(animalService.addAnimalTypeToAnimal(animalId, typeId)));
     }
 
     @PutMapping("/{animalId}/types")
     public ResponseEntity<AnimalDto> updateAnimalTypeInAnimal(@PathVariable("animalId") Long animalId,
-                                                           @RequestBody TypeDto typeDto) throws AnimalNotFoundException,
-            AnimalTypeAlreadyExist, AnimalTypeNotFoundException, AnimalDoesNotHaveTypeException {
+                                                           @RequestBody TypeDto typeDto) {
         return ResponseEntity.ok(convertToDto(animalService.updateAnimalTypesInAnimal(animalId, typeDto)));
     }
 

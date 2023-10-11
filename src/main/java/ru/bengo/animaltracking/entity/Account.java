@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "accounts")
 @Getter
@@ -32,4 +34,10 @@ public class Account {
     @JsonIgnore
     @Column(nullable = false)
     private String password;
+
+    @OneToMany(mappedBy = "chipper")
+    @JsonIgnore
+    @ToString.Exclude
+    private List<Animal> animals;
+
 }

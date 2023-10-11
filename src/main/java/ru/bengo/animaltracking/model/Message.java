@@ -18,9 +18,10 @@ public enum Message {
     UPDATE_DEAD_TO_ALIVE("This animal is already dead"),
     NEW_CHIPPING_LOCATION_ID_EQUALS_FIRST_VISITED_LOCATION("New chipping location id equals first visited location id"),
     NO_ACCESS("No rights to access"),
-    ACCOUNT_NOT_FOUND_GET("GET: Account with this id haven't found"),
-    ACCOUNT_NOT_FOUND_METHOD("Account with this id haven't found"),
-    LOCATION_NOT_FOUND("Location with this id haven't found")
+    ACCOUNT_NOT_FOUND("Account with this id haven't found"),
+    LOCATION_NOT_FOUND("Location with this id haven't found"),
+    ACCOUNT_ASSOCIATION("Account is associated with an animal"),
+    LOCATION_ASSOCIATION("Location is associated with an animal")
     ;
 
     private final String info;

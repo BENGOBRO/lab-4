@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.bengo.animaltracking.dto.AnimalTypeDto;
 import ru.bengo.animaltracking.entity.AnimalType;
-import ru.bengo.animaltracking.exception.AnimalTypeAlreadyExist;
-import ru.bengo.animaltracking.exception.AnimalTypeNotFoundException;
+import ru.bengo.animaltracking.exception.ConflictException;
+import ru.bengo.animaltracking.exception.NotFoundException;
 import ru.bengo.animaltracking.model.Message;
 import ru.bengo.animaltracking.repository.AnimalTypeRepository;
 import ru.bengo.animaltracking.service.AnimalTypeService;
@@ -22,26 +22,26 @@ public class AnimalTypeServiceImpl implements AnimalTypeService {
     private final AnimalTypeRepository animalTypeRepository;
 
     @Override
-    public AnimalType create(@Valid AnimalTypeDto animalTypeDto) throws AnimalTypeAlreadyExist {
+    public AnimalType create(@Valid AnimalTypeDto animalTypeDto) throws ConflictException {
         if (isAnimalTypeWithTypeExist(animalTypeDto.type())) {
-            throw new AnimalTypeAlreadyExist(Message.ANIMAL_TYPE_EXIST.getInfo());
+            throw new ConflictException(Message.ANIMAL_TYPE_EXIST.getInfo());
         }
         return animalTypeRepository.save(convertToEntity(animalTypeDto));
     }
 
     @Override
-    public AnimalType get(@NotNull @Positive Long id) throws AnimalTypeNotFoundException {
+    public AnimalType get(@NotNull @Positive Long id) throws NotFoundException {
         return animalTypeRepository.findById(id)
-                .orElseThrow(() -> new AnimalTypeNotFoundException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo()));
+                .orElseThrow(() -> new NotFoundException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo()));
     }
 
     @Override
-    public AnimalType update(Long id, AnimalTypeDto animalTypeDto) throws AnimalTypeAlreadyExist, AnimalTypeNotFoundException {
+    public AnimalType update(Long id, AnimalTypeDto animalTypeDto) throws NotFoundException, ConflictException {
         animalTypeRepository.findById(id)
-                .orElseThrow(() -> new AnimalTypeNotFoundException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo()));
+                .orElseThrow(() -> new NotFoundException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo()));
 
         if (isAnimalTypeWithTypeExist(animalTypeDto.type())) {
-            throw new AnimalTypeAlreadyExist(Message.ANIMAL_TYPE_EXIST.getInfo());
+            throw new ConflictException(Message.ANIMAL_TYPE_EXIST.getInfo());
         }
 
         AnimalType animalType = convertToEntity(animalTypeDto);
@@ -50,9 +50,9 @@ public class AnimalTypeServiceImpl implements AnimalTypeService {
     }
 
     @Override
-    public void delete(@NotNull @Positive Long id) throws AnimalTypeNotFoundException {
+    public void delete(@NotNull @Positive Long id) throws NotFoundException {
         animalTypeRepository.findById(id)
-                .orElseThrow(() -> new AnimalTypeNotFoundException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo()));
+                .orElseThrow(() -> new NotFoundException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo()));
         animalTypeRepository.deleteById(id);
     }
 

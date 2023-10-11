@@ -1,15 +1,13 @@
 package ru.bengo.animaltracking.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.bengo.animaltracking.dto.AnimalTypeDto;
-import ru.bengo.animaltracking.exception.AnimalTypeAlreadyExist;
-import ru.bengo.animaltracking.exception.AnimalTypeNotFoundException;
 import ru.bengo.animaltracking.entity.AnimalType;
+import ru.bengo.animaltracking.exception.ConflictException;
+import ru.bengo.animaltracking.exception.NotFoundException;
 import ru.bengo.animaltracking.service.AnimalTypeService;
 
 @RestController
@@ -20,22 +18,22 @@ public class AnimalTypeController {
     private final AnimalTypeService animalTypeService;
 
     @PostMapping
-    public ResponseEntity<AnimalType> createAnimalType(@RequestBody AnimalTypeDto animalTypeDto) throws AnimalTypeAlreadyExist {
+    public ResponseEntity<AnimalType> createAnimalType(@RequestBody AnimalTypeDto animalTypeDto) throws ConflictException {
         return ResponseEntity.status(HttpStatus.CREATED).body(animalTypeService.create(animalTypeDto));
     }
 
     @GetMapping("/{typeId}")
-    public ResponseEntity<AnimalType> getAnimalType(@PathVariable("typeId") Long id) throws AnimalTypeNotFoundException {
+    public ResponseEntity<AnimalType> getAnimalType(@PathVariable("typeId") Long id) throws NotFoundException {
         return ResponseEntity.ok(animalTypeService.get(id));
     }
 
     @PutMapping("/{typeId}")
-    public ResponseEntity<AnimalType> updateAnimalType(@PathVariable("typeId") Long id, @RequestBody AnimalTypeDto animalTypeDto) throws AnimalTypeAlreadyExist, AnimalTypeNotFoundException {
+    public ResponseEntity<AnimalType> updateAnimalType(@PathVariable("typeId") Long id, @RequestBody AnimalTypeDto animalTypeDto) throws ConflictException, NotFoundException {
         return ResponseEntity.ok(animalTypeService.update(id, animalTypeDto));
     }
 
     @DeleteMapping("/{typeId}")
-    public ResponseEntity<?> deleteAnimalType(@PathVariable("typeId") Long id) throws AnimalTypeNotFoundException {
+    public ResponseEntity<?> deleteAnimalType(@PathVariable("typeId") Long id) throws NotFoundException {
         animalTypeService.delete(id);
         return ResponseEntity.ok().build();
     }

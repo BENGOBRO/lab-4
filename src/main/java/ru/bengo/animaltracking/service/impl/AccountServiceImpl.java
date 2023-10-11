@@ -16,9 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.bengo.animaltracking.dto.AccountDto;
 import ru.bengo.animaltracking.entity.Account;
-import ru.bengo.animaltracking.exception.AccountNotFoundException;
-import ru.bengo.animaltracking.exception.NoAccessException;
-import ru.bengo.animaltracking.exception.UserAlreadyExistException;
+import ru.bengo.animaltracking.exception.*;
 import ru.bengo.animaltracking.model.Message;
 import ru.bengo.animaltracking.model.User;
 import ru.bengo.animaltracking.repository.AccountRepository;
@@ -37,11 +35,11 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
-    public Account register(@Valid AccountDto accountDto) throws UserAlreadyExistException{
+    public Account register(@Valid AccountDto accountDto) throws ConflictException {
         String email = accountDto.email();
 
         if (isEmailExist(email)) {
-            throw new UserAlreadyExistException(Message.ACCOUNT_EXIST.getInfo());
+            throw new ConflictException(Message.ACCOUNT_EXIST.getInfo());
         }
 
         Account account = convertToEntity(accountDto);
@@ -50,41 +48,9 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     }
 
     @Override
-    public Account get(@NotNull @Positive Integer id) throws AccountNotFoundException {
+    public Account get(@NotNull @Positive Integer id) throws NotFoundException {
         return accountRepository.findById(id)
-                .orElseThrow(() -> new AccountNotFoundException(Message.ACCOUNT_NOT_FOUND_GET.getInfo()));
-    }
-
-
-    @Override
-    public Account update(@Valid AccountDto accountDto,@NotNull @Positive Integer id) throws UserAlreadyExistException, NoAccessException, AccountNotFoundException {
-        String email = accountDto.email();
-        accountRepository.findById(id)
-                .orElseThrow(() -> new AccountNotFoundException(Message.ACCOUNT_NOT_FOUND_METHOD.getInfo()));
-
-        if (!isUserUpdatingTheirAccount(id)) {
-            throw new NoAccessException(Message.NO_ACCESS.getInfo());
-        }
-        if (!isEmailExist(email, id)) {
-            throw new UserAlreadyExistException(Message.ACCOUNT_EXIST.getInfo());
-        }
-
-        Account account = convertToEntity(accountDto);
-        account.setId(id);
-        account.setPassword(passwordEncoder.encode(account.getPassword()));
-        return accountRepository.save(account);
-    }
-
-    @Override
-    public void delete(@NotNull @Positive Integer id) throws NoAccessException, AccountNotFoundException {
-        accountRepository.findById(id)
-                .orElseThrow(() -> new AccountNotFoundException(Message.ACCOUNT_NOT_FOUND_METHOD.getInfo()));
-
-        if (!isUserUpdatingTheirAccount(id)) {
-            throw new NoAccessException(Message.NO_ACCESS.getInfo());
-        }
-
-        accountRepository.deleteById(id);
+                .orElseThrow(() -> new NotFoundException(Message.ACCOUNT_NOT_FOUND.getInfo()));
     }
 
     @Override
@@ -96,6 +62,40 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
                 accountRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrEmailContainingIgnoreCaseOrderById(firstName, lastName, email, pageRequest);
 
         return accounts.stream().skip(from).toList();
+    }
+
+    @Override
+    public Account update(@Valid AccountDto accountDto,@NotNull @Positive Integer id) throws ForbiddenException, ConflictException {
+        String email = accountDto.email();
+        accountRepository.findById(id)
+                .orElseThrow(() -> new ForbiddenException(Message.ACCOUNT_NOT_FOUND.getInfo()));
+
+        if (!isUserUpdatingTheirAccount(id)) {
+            throw new ForbiddenException(Message.NO_ACCESS.getInfo());
+        }
+        if (!isEmailExist(email, id)) {
+            throw new ConflictException(Message.ACCOUNT_EXIST.getInfo());
+        }
+
+        Account account = convertToEntity(accountDto);
+        account.setId(id);
+        account.setPassword(passwordEncoder.encode(account.getPassword()));
+        return accountRepository.save(account);
+    }
+
+    @Override
+    public void delete(@NotNull @Positive Integer id) throws ForbiddenException, BadRequestException {
+        Account account =accountRepository.findById(id)
+                .orElseThrow(() -> new ForbiddenException(Message.ACCOUNT_NOT_FOUND.getInfo()));
+
+        if (!isUserUpdatingTheirAccount(id)) {
+            throw new ForbiddenException(Message.NO_ACCESS.getInfo());
+        }
+        if (!account.getAnimals().isEmpty()) {
+            throw new BadRequestException(Message.ACCOUNT_ASSOCIATION.getInfo());
+        }
+
+        accountRepository.deleteById(id);
     }
 
     @Override

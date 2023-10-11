@@ -1,7 +1,10 @@
 package ru.bengo.animaltracking.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "locations")
@@ -23,4 +26,9 @@ public class Location {
 
     @Column(nullable = false, unique = true)
     private Double longitude;
+
+    @OneToMany(mappedBy = "chippingLocation")
+    @JsonIgnore
+    @ToString.Exclude
+    private List<Animal> animals;
 }

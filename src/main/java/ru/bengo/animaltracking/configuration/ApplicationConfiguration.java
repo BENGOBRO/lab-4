@@ -29,7 +29,10 @@ public class ApplicationConfiguration {
                 x -> x.skip(AnimalDto::setVisitedLocations)
         );
         propertyMapperAnimal.addMappings(
-                x -> x.map(Animal::getChipperId, AnimalDto::setChipperId)
+                x -> x.map(src -> src.getChipper().getId(), AnimalDto::setChipperId)
+        );
+        propertyMapperAnimal.addMappings(
+                x -> x.map(src -> src.getChippingLocation().getId(), AnimalDto::setChippingLocationId)
         );
 
         return modelMapper;

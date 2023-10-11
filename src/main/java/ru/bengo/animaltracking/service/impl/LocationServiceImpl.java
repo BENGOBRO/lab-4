@@ -9,8 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.bengo.animaltracking.dto.LocationDto;
 import ru.bengo.animaltracking.entity.Location;
-import ru.bengo.animaltracking.exception.LocationAlreadyExistException;
-import ru.bengo.animaltracking.exception.LocationNotFoundException;
+import ru.bengo.animaltracking.exception.*;
 import ru.bengo.animaltracking.model.Message;
 import ru.bengo.animaltracking.repository.LocationRepository;
 import ru.bengo.animaltracking.service.LocationService;
@@ -24,27 +23,27 @@ public class LocationServiceImpl implements LocationService {
     private final LocationRepository locationRepository;
 
     @Override
-    public Location create(@Valid LocationDto locationDto) throws LocationAlreadyExistException {
+    public Location create(@Valid LocationDto locationDto) throws ConflictException {
         if (isLocationWithLatitudeAndLongitudeExist(locationDto.latitude(), locationDto.longitude())) {
-            throw new LocationAlreadyExistException(Message.LOCATION_EXIST.getInfo());
+            throw new ConflictException(Message.LOCATION_EXIST.getInfo());
         }
 
         return locationRepository.save(convertToEntity(locationDto));
     }
 
     @Override
-    public Location get(@NotNull @Positive Long id) throws LocationNotFoundException {
+    public Location get(@NotNull @Positive Long id) throws NotFoundException {
         return locationRepository.findById(id)
-                .orElseThrow(() -> new LocationNotFoundException(Message.LOCATION_NOT_FOUND.getInfo()));
+                .orElseThrow(() -> new NotFoundException(Message.LOCATION_NOT_FOUND.getInfo()));
     }
 
     @Override
-    public Location update(@Valid LocationDto locationDto, @NotNull @Positive Long id) throws LocationAlreadyExistException, LocationNotFoundException {
+    public Location update(@Valid LocationDto locationDto, @NotNull @Positive Long id) throws ConflictException, NotFoundException {
         locationRepository.findById(id)
-                .orElseThrow(() -> new LocationNotFoundException(Message.LOCATION_NOT_FOUND.getInfo()));
+                .orElseThrow(() -> new NotFoundException(Message.LOCATION_NOT_FOUND.getInfo()));
 
         if (isLocationWithLatitudeAndLongitudeExist(locationDto.latitude(), locationDto.longitude())) {
-            throw new LocationAlreadyExistException(Message.LOCATION_EXIST.getInfo());
+            throw new ConflictException(Message.LOCATION_EXIST.getInfo());
         }
 
         Location location = convertToEntity(locationDto);
@@ -53,9 +52,13 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
-    public void delete(@NotNull @Positive Long id) throws LocationNotFoundException {
-        locationRepository.findById(id)
-                .orElseThrow(() -> new LocationNotFoundException(Message.LOCATION_NOT_FOUND.getInfo()));
+    public void delete(@NotNull @Positive Long id) throws NotFoundException, BadRequestException {
+        Location location =locationRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(Message.LOCATION_NOT_FOUND.getInfo()));
+
+        if (!location.getAnimals().isEmpty()) {
+            throw new BadRequestException(Message.LOCATION_ASSOCIATION.getInfo());
+        }
 
         locationRepository.deleteById(id);
     }
