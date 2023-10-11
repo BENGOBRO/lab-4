@@ -24,6 +24,11 @@ public class Animal {
     private Long id;
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinTable(
+            name = "animals_animal_types",
+            joinColumns = @JoinColumn(name = "animal_id"),
+            inverseJoinColumns = @JoinColumn(name = "animal_type_id")
+    )
     @ToString.Exclude
     private List<AnimalType> animalTypes;
 

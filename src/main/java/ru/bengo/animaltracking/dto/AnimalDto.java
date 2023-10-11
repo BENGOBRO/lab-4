@@ -17,8 +17,7 @@ public class AnimalDto {
         private Long id;
 
         @JsonProperty("animalTypes")
-        @NotEmpty
-        private List<Long> animalTypes;
+        private List<Long> animalTypesIds;
 
         @NotNull
         @Positive
@@ -58,7 +57,7 @@ public class AnimalDto {
         private Long chippingLocationId;
 
         @JsonProperty("visitedLocations")
-        private List<Long> visitedLocations;
+        private List<Long> visitedLocationsIds;
 
         @JsonProperty("deathDateTime")
         private Date deathDateTime;

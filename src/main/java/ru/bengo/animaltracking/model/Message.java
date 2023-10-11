@@ -21,7 +21,9 @@ public enum Message {
     ACCOUNT_NOT_FOUND("Account with this id haven't found"),
     LOCATION_NOT_FOUND("Location with this id haven't found"),
     ACCOUNT_ASSOCIATION("Account is associated with an animal"),
-    LOCATION_ASSOCIATION("Location is associated with an animal")
+    LOCATION_ASSOCIATION("Location is associated with an animal"),
+    ANIMAL_ASSOCIATION("Animal is associated with visited locations"),
+    ANIMAL_TYPE_ASSOCIATION("Animal is associated with animal type")
     ;
 
     private final String info;

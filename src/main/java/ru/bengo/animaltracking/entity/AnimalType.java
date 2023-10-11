@@ -1,7 +1,10 @@
 package ru.bengo.animaltracking.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "animal_types")
@@ -20,4 +23,9 @@ public class AnimalType {
 
     @Column(nullable = false, unique = true)
     private String type;
+
+    @ManyToMany(mappedBy = "animalTypes")
+    @ToString.Exclude
+    @JsonIgnore
+    private List<Animal> animals;
 }

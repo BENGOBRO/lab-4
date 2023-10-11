@@ -35,7 +35,7 @@ public class AnimalController {
     private final ModelMapper modelMapper;
 
     @PostMapping
-    public ResponseEntity<AnimalDto> createAnimal(@RequestBody AnimalDto animalDto) throws ConflictException, NotFoundException {
+    public ResponseEntity<AnimalDto> createAnimal(@RequestBody AnimalDto animalDto) throws ConflictException, NotFoundException, BadRequestException {
         return ResponseEntity.status(HttpStatus.CREATED).body(convertToDto(animalService.create(animalDto)));
     }
 
@@ -51,7 +51,7 @@ public class AnimalController {
     }
 
     @DeleteMapping("/{animalId}")
-    public ResponseEntity<?> deleteAnimal(@PathVariable("animalId") Long id) throws NotFoundException {
+    public ResponseEntity<?> deleteAnimal(@PathVariable("animalId") Long id) throws NotFoundException, BadRequestException {
         animalService.delete(id);
         return ResponseEntity.ok().build();
     }
@@ -88,8 +88,8 @@ public class AnimalController {
         List<Long> animalTypes = animal.getAnimalTypes().stream().map(AnimalType::getId).toList();
         List<Long> visitedLocations = Optional.ofNullable(animal.getVisitedLocations()).orElse(new ArrayList<>()).stream().map(AnimalVisitedLocation::getId).toList();
         AnimalDto animalDto = modelMapper.map(animal, AnimalDto.class);
-        animalDto.setAnimalTypes(animalTypes);
-        animalDto.setVisitedLocations(visitedLocations);
+        animalDto.setAnimalTypesIds(animalTypes);
+        animalDto.setVisitedLocationsIds(visitedLocations);
         return animalDto;
     }
 

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.bengo.animaltracking.dto.AnimalTypeDto;
 import ru.bengo.animaltracking.entity.AnimalType;
+import ru.bengo.animaltracking.exception.BadRequestException;
 import ru.bengo.animaltracking.exception.ConflictException;
 import ru.bengo.animaltracking.exception.NotFoundException;
 import ru.bengo.animaltracking.service.AnimalTypeService;
@@ -33,7 +34,7 @@ public class AnimalTypeController {
     }
 
     @DeleteMapping("/{typeId}")
-    public ResponseEntity<?> deleteAnimalType(@PathVariable("typeId") Long id) throws NotFoundException {
+    public ResponseEntity<?> deleteAnimalType(@PathVariable("typeId") Long id) throws NotFoundException, BadRequestException {
         animalTypeService.delete(id);
         return ResponseEntity.ok().build();
     }

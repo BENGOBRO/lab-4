@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.bengo.animaltracking.dto.AnimalTypeDto;
 import ru.bengo.animaltracking.entity.AnimalType;
+import ru.bengo.animaltracking.exception.BadRequestException;
 import ru.bengo.animaltracking.exception.ConflictException;
 import ru.bengo.animaltracking.exception.NotFoundException;
 import ru.bengo.animaltracking.model.Message;
@@ -50,9 +51,14 @@ public class AnimalTypeServiceImpl implements AnimalTypeService {
     }
 
     @Override
-    public void delete(@NotNull @Positive Long id) throws NotFoundException {
-        animalTypeRepository.findById(id)
+    public void delete(@NotNull @Positive Long id) throws NotFoundException, BadRequestException {
+        AnimalType animalType = animalTypeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo()));
+
+        if (!animalType.getAnimals().isEmpty()) {
+            throw new BadRequestException(Message.ANIMAL_TYPE_ASSOCIATION.getInfo());
+        }
+
         animalTypeRepository.deleteById(id);
     }
 

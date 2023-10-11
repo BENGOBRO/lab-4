@@ -13,13 +13,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AnimalService {
-    Animal create(@Valid AnimalDto animalDto) throws ConflictException, NotFoundException;
+    Animal create(@Valid AnimalDto animalDto) throws ConflictException, NotFoundException, BadRequestException;
 
     Animal get(@NotNull @Positive Long id) throws NotFoundException;
 
     Animal update(@NotNull @Positive Long id, @Valid AnimalDto animal) throws NotFoundException, BadRequestException;
 
-    void delete(@NotNull @Positive Long id) throws NotFoundException;
+    void delete(@NotNull @Positive Long id) throws NotFoundException, BadRequestException;
 
     List<Animal> search(LocalDateTime startDateTime, LocalDateTime endDateTime,
                         @Positive Integer chipperId, @Positive Long chippingLocationId,

@@ -23,10 +23,10 @@ public class ApplicationConfiguration {
 
         TypeMap<Animal, AnimalDto> propertyMapperAnimal = modelMapper.createTypeMap(Animal.class, AnimalDto.class);
         propertyMapperAnimal.addMappings(
-                x -> x.skip(AnimalDto::setAnimalTypes)
+                x -> x.skip(AnimalDto::setAnimalTypesIds)
         );
         propertyMapperAnimal.addMappings(
-                x -> x.skip(AnimalDto::setVisitedLocations)
+                x -> x.skip(AnimalDto::setVisitedLocationsIds)
         );
         propertyMapperAnimal.addMappings(
                 x -> x.map(src -> src.getChipper().getId(), AnimalDto::setChipperId)
