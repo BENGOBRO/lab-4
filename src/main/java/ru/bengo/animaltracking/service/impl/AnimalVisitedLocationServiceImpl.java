@@ -10,7 +10,10 @@ import ru.bengo.animaltracking.dto.AnimalVisitedLocationDto;
 import ru.bengo.animaltracking.entity.Animal;
 import ru.bengo.animaltracking.entity.AnimalVisitedLocation;
 import ru.bengo.animaltracking.entity.Location;
+import ru.bengo.animaltracking.exception.BadRequestException;
 import ru.bengo.animaltracking.exception.NotFoundException;
+import ru.bengo.animaltracking.model.LifeStatus;
+import ru.bengo.animaltracking.model.Message;
 import ru.bengo.animaltracking.repository.AnimalVisitedLocationRepository;
 import ru.bengo.animaltracking.service.AnimalService;
 import ru.bengo.animaltracking.service.AnimalVisitedLocationService;
@@ -29,9 +32,25 @@ public class AnimalVisitedLocationServiceImpl implements AnimalVisitedLocationSe
     private final AnimalService animalService;
 
     @Override
-    public AnimalVisitedLocation create(@NotNull @Positive Long animalId, @NotNull @Positive Long locationId) throws NotFoundException {
+    public AnimalVisitedLocation create(@NotNull @Positive Long animalId, @NotNull @Positive Long locationId) throws NotFoundException, BadRequestException {
         Location visitedLocation = locationService.get(locationId);
         Animal animal = animalService.get(animalId);
+        var visitedLocations = animal.getVisitedLocations();
+        if (animal.getLifeStatus().equals(LifeStatus.DEAD)) {
+            throw new BadRequestException(Message.ANIMAL_IS_DEAD.getInfo());
+        }
+        if (animal.getChippingLocation().getId().equals(locationId) && visitedLocations.isEmpty()) {
+            throw new BadRequestException(Message.ANIMAL_IN_CHIPPING_LOCATION.getInfo());
+        }
+        if (animal.getChippingLocation().equals(visitedLocation)) {
+            throw new BadRequestException(Message.CHIPPING_LOCATION_IS_VISITED_LOCATION.getInfo());
+        }
+
+        int lastIndex = visitedLocations.size() - 1;
+        if (!visitedLocations.isEmpty() && visitedLocations.get(lastIndex).getLocation().equals(visitedLocation)) {
+            throw new BadRequestException(Message.ANIMAL_IS_ALREADY_LOCATED.getInfo());
+        }
+
         return animalVisitedLocationRepository.save(convertToEntity(visitedLocation, animal));
     }
 
@@ -44,8 +63,20 @@ public class AnimalVisitedLocationServiceImpl implements AnimalVisitedLocationSe
     }
 
     @Override
-    public AnimalVisitedLocation update(@NotNull @Positive Long animalId, AnimalVisitedLocationDto animalVisitedLocationDto) {
-        return null;
+    public AnimalVisitedLocation update(@NotNull @Positive Long animalId, AnimalVisitedLocationDto animalVisitedLocationDto) throws NotFoundException, BadRequestException {
+        Animal animal = animalService.get(animalId);
+        AnimalVisitedLocation animalVisitedLocation = animalVisitedLocationRepository.findById(animalVisitedLocationDto.getId())
+                .orElseThrow(() -> new NotFoundException(Message.ANIMAL_VISITED_LOCATION_NOT_FOUND.getInfo()));
+        Location newVisitedLocation = locationService.get(animalVisitedLocationDto.getLocationPointId());
+        var visitedLocations = animal.getVisitedLocations();
+        if (!visitedLocations.contains(animalVisitedLocation)) {
+            throw new NotFoundException(Message.ANIMAL_VISITED_LOCATION_NOT_FOUND.getInfo());
+        }
+        if (newVisitedLocation.equals(animal.getChippingLocation())) {
+            throw new BadRequestException(Message.CHIPPING_LOCATION_IS_VISITED_LOCATION.getInfo());
+        }
+        animalVisitedLocation.setLocation(newVisitedLocation);
+        return animalVisitedLocation;
     }
 
     @Override
@@ -59,4 +90,8 @@ public class AnimalVisitedLocationServiceImpl implements AnimalVisitedLocationSe
                 .animal(animal)
                 .build();
     }
+
+//    private boolean isNeighbour() {
+//
+//    }
 }

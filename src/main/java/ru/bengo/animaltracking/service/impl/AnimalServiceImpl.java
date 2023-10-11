@@ -12,8 +12,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.bengo.animaltracking.dto.AnimalDto;
 import ru.bengo.animaltracking.dto.TypeDto;
-import ru.bengo.animaltracking.entity.*;
-import ru.bengo.animaltracking.exception.*;
+import ru.bengo.animaltracking.entity.Account;
+import ru.bengo.animaltracking.entity.Animal;
+import ru.bengo.animaltracking.entity.AnimalType;
+import ru.bengo.animaltracking.entity.Location;
+import ru.bengo.animaltracking.exception.BadRequestException;
+import ru.bengo.animaltracking.exception.ConflictException;
+import ru.bengo.animaltracking.exception.NotFoundException;
 import ru.bengo.animaltracking.model.Gender;
 import ru.bengo.animaltracking.model.LifeStatus;
 import ru.bengo.animaltracking.model.Message;
@@ -22,12 +27,10 @@ import ru.bengo.animaltracking.service.AccountService;
 import ru.bengo.animaltracking.service.AnimalService;
 import ru.bengo.animaltracking.service.AnimalTypeService;
 import ru.bengo.animaltracking.service.LocationService;
-import ru.bengo.animaltracking.service.interfaces.ThrowingFunction;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 @Service
 @Validated
@@ -67,9 +70,8 @@ public class AnimalServiceImpl implements AnimalService {
 
 
     @Override
-    public Animal update(@NotNull @Positive Long id, @Valid AnimalDto animalDto) throws NotFoundException, BadRequestException {
-        var animal = animalRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(Message.ANIMAL_NOT_FOUND.getInfo()));
+    public Animal update(@NotNull @Positive Long animalId, @Valid AnimalDto animalDto) throws NotFoundException, BadRequestException {
+        var animal = get(animalId);
         var newChipper = accountService.get(animalDto.getChipperId());
         var newChippingLocation = locationService.get(animalDto.getChippingLocationId());
 
@@ -99,15 +101,14 @@ public class AnimalServiceImpl implements AnimalService {
     }
 
     @Override
-    public void delete(@NotNull @Positive Long id) throws NotFoundException, BadRequestException {
-        Animal animal = animalRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(Message.ANIMAL_NOT_FOUND.getInfo()));
+    public void delete(@NotNull @Positive Long animalId) throws NotFoundException, BadRequestException {
+        Animal animal = get(animalId);
 
         if (!animal.getVisitedLocations().isEmpty()) {
             throw new BadRequestException(Message.ANIMAL_ASSOCIATION.getInfo());
         }
 
-        animalRepository.deleteById(id);
+        animalRepository.deleteById(animalId);
     }
 
     @Override
@@ -122,75 +123,52 @@ public class AnimalServiceImpl implements AnimalService {
     }
 
     @Override
-    public Animal addAnimalTypeToAnimal(Long animalId, Long typeId) {
-        return null;
+    public Animal addAnimalTypeToAnimal(@NotNull @Positive Long animalId, @NotNull @Positive Long typeId) throws NotFoundException, ConflictException {
+        Animal animal = get(animalId);
+        AnimalType animalType = animalTypeService.get(typeId);
+        List<AnimalType> animalTypes = animal.getAnimalTypes();
+        if (animalTypes.contains(animalType)) {
+            throw new ConflictException(Message.ANIMAL_TYPES_CONTAIN_NEW_ANIMAL_TYPE.getInfo());
+        }
+        animalTypes.add(animalType);
+        animal.setAnimalTypes(animalTypes);
+        return animalRepository.save(animal);
     }
 
     @Override
-    public Animal updateAnimalTypesInAnimal(Long animalId, TypeDto typeDto) {
-        return null;
+    public Animal updateAnimalTypeInAnimal(@NotNull @Positive Long animalId, @Valid TypeDto typeDto) throws NotFoundException, ConflictException {
+        Animal animal = get(animalId);
+        AnimalType oldType = animalTypeService.get(typeDto.oldTypeId());
+        AnimalType newType = animalTypeService.get(typeDto.newTypeId());
+        List<AnimalType> animalTypes = animal.getAnimalTypes();
+        if (!animalTypes.contains(oldType)) {
+            throw new NotFoundException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo());
+        }
+        if (animalTypes.contains(newType) || (animalTypes.contains(oldType) && animalTypes.contains(newType))) {
+            throw new ConflictException(Message.ANIMAL_TYPES_CONTAIN_NEW_ANIMAL_TYPE.getInfo());
+        }
+        animalTypes.remove(oldType);
+        animalTypes.add(newType);
+        animal.setAnimalTypes(animalTypes);
+        return animal;
     }
-//
-//    @Override
-//    public AnimalDto addAnimalTypeToAnimal(@NotNull @Positive Long animalId,
-//                                        @NotNull @Positive Long typeId) throws AnimalNotFoundException,
-//            AnimalTypeNotFoundException, AnimalTypesContainNewAnimalTypeException {
-//
-//        var foundAnimal = animalRepository.findById(animalId);
-//        if (foundAnimal.isEmpty()) {
-//            throw new AnimalNotFoundException(Message.ANIMAL_NOT_FOUND.getInfo());
-//        }
-//
-//        Animal animal = foundAnimal.get();
-//        var animalTypes = animal.getAnimalTypes();
-//        var animalTypesIds = getAnimalTypesIds(animalTypes);
-//        if (isAnimalTypesContainNewAnimalTypeId(animalTypesIds, typeId)) {
-//            throw new AnimalTypesContainNewAnimalTypeException(Message.ANIMAL_TYPES_CONTAIN_NEW_ANIMAL_TYPE.getInfo());
-//        }
-//
-//        animalTypes.add(animalTypeService.get(typeId));
-//        animal.setAnimalTypes(animalTypes);
-//        var savedAnimal = animalRepository.save(animal);
-//        var savedAnimalTypesIds = getAnimalTypesIds(savedAnimal.getAnimalTypes());
-//        var savedAnimalVisitedLocationsIds = getVisitedLocationsIds(savedAnimal.getVisitedLocations());
-//        return convertToDto(savedAnimal, savedAnimalTypesIds, savedAnimalVisitedLocationsIds);
-//    }
-//
-//    @Override
-//    public AnimalDto updateAnimalTypesInAnimal(@NotNull @Positive Long animalId,
-//                                            @Valid TypeDto typeDto) throws AnimalNotFoundException,
-//            AnimalTypeNotFoundException, AnimalDoesNotHaveTypeException, AnimalTypeAlreadyExist {
-//
-//        Optional<Animal> foundAnimal = animalRepository.findById(animalId);
-//        if (foundAnimal.isEmpty()) {
-//            throw new AnimalNotFoundException(Message.ANIMAL_NOT_FOUND.getInfo());
-//        }
-//
-//        var newTypeId = typeDto.newTypeId();
-//        var oldTypeId = typeDto.oldTypeId();
-//        var newType = animalTypeService.get(newTypeId);
-//        var oldType = animalTypeService.get(oldTypeId);
-//        if (!isAnimalTypeExist(oldTypeId)) {
-//            throw new AnimalDoesNotHaveTypeException(Message.ANIMAL_DOES_NOT_HAVE_TYPE.getInfo());
-//        }
-//        if (isAnimalTypeExist(newTypeId)) {
-//            throw new AnimalTypeAlreadyExist(Message.ANIMAL_TYPE_EXIST.getInfo());
-//        }
-//        if (isAnimalTypesExist(List.of(newTypeId, oldTypeId))) {
-//            throw new AnimalTypeAlreadyExist(Message.ANIMAL_TYPES_EXISTS_WITH_NEW_OLD_TYPES.getInfo());
-//        }
-//
-//        Animal animal = foundAnimal.get();
-//        List<AnimalType> animalTypes = animal.getAnimalTypes();
-//        animalTypes.remove(oldType);
-//        animalTypes.add(newType);
-//        animal.setAnimalTypes(animalTypes);
-//        var savedAnimal = animalRepository.save(animal);
-//        var savedAnimalTypesIds = getAnimalTypesIds(savedAnimal.getAnimalTypes());
-//        var savedAnimalVisitedLocationsIds = getVisitedLocationsIds(savedAnimal.getVisitedLocations());
-//        return convertToDto(savedAnimal, savedAnimalTypesIds, savedAnimalVisitedLocationsIds);
-//    }
-//
+
+    @Override
+    public Animal deleteAnimalTypeInAnimal(@NotNull @Positive Long animalId, @NotNull @Positive Long typeId) throws NotFoundException, BadRequestException {
+        Animal animal = get(animalId);
+        AnimalType animalType = animalTypeService.get(typeId);
+        List<AnimalType> animalTypes = animal.getAnimalTypes();
+        if (animalTypes.size() == 1 && animalTypes.get(0).equals(animalType)) {
+            throw new BadRequestException(Message.LAST_ANIMAL_TYPE.getInfo());
+        }
+        if (!animalTypes.contains(animalType)) {
+            throw new NotFoundException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo());
+        }
+        animalTypes.remove(animalType);
+        animal.setAnimalTypes(animalTypes);
+        return animalRepository.save(animal);
+    }
+
     private Animal convertToEntity(AnimalDto animalDto, List<AnimalType> animalTypes,
                                    Account chipper, Location chippingLocation) {
         Animal animal = modelMapper.map(animalDto, Animal.class);
@@ -198,25 +176,6 @@ public class AnimalServiceImpl implements AnimalService {
         animal.setChipper(chipper);
         animal.setChippingLocation(chippingLocation);
         return animal;
-    }
-
-    private static <T, R> Function<T, R> throwingFunctionWrapper(
-            ThrowingFunction<T, R, Exception> throwingFunction) {
-        return i -> {
-            try {
-                return throwingFunction.apply(i);
-            } catch (Exception e) {
-                throw new RuntimeException();
-            }
-        };
-    }
-
-    private List<AnimalType> getAnimalTypesById(List<Long> animalTypesIds) {
-        return animalTypesIds.stream().map(throwingFunctionWrapper(animalTypeService::get)).toList();
-    }
-
-    private List<Long> getAnimalTypesIds(List<AnimalType> animalTypes) {
-        return animalTypes.stream().map(AnimalType::getId).toList();
     }
 
     private boolean isDead(LifeStatus lifeStatus) {
@@ -231,20 +190,7 @@ public class AnimalServiceImpl implements AnimalService {
         return animalTypes;
     }
 
-    private boolean isAnimalTypeExist(Long animalTypeId) throws NotFoundException {
-        return animalTypeService.get(animalTypeId) != null;
-    }
-
     private boolean hasAnimalTypesDuplicates(List<Long> animalTypes) {
         return animalTypes.stream().distinct().count() < animalTypes.size();
-    }
-
-//    private boolean isNewChippingLocationIdEqualsFirstVisitedLocationId(Long newChippingLocationId,
-//                                                                        Long firstVisitedLocationId) {
-//        return newChippingLocationId.equals(firstVisitedLocationId);
-//    }
-
-    private boolean isAnimalTypesContainNewAnimalTypeId(List<Long> animalTypes, Long newAnimalType) {
-        return animalTypes.stream().anyMatch((newType) -> newType.equals(newAnimalType));
     }
 }

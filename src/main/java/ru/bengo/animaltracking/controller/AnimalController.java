@@ -74,14 +74,20 @@ public class AnimalController {
 
     @PostMapping("/{animalId}/types/{typeId}")
     public ResponseEntity<AnimalDto> addAnimalTypeToAnimal(@PathVariable("animalId") Long animalId,
-                                                        @PathVariable("typeId") Long typeId) {
+                                                        @PathVariable("typeId") Long typeId) throws ConflictException, NotFoundException {
         return ResponseEntity.status(HttpStatus.CREATED).body(convertToDto(animalService.addAnimalTypeToAnimal(animalId, typeId)));
     }
 
     @PutMapping("/{animalId}/types")
     public ResponseEntity<AnimalDto> updateAnimalTypeInAnimal(@PathVariable("animalId") Long animalId,
-                                                           @RequestBody TypeDto typeDto) {
-        return ResponseEntity.ok(convertToDto(animalService.updateAnimalTypesInAnimal(animalId, typeDto)));
+                                                           @RequestBody TypeDto typeDto) throws ConflictException, NotFoundException {
+        return ResponseEntity.ok(convertToDto(animalService.updateAnimalTypeInAnimal(animalId, typeDto)));
+    }
+
+    @DeleteMapping("/{animalId}/types/{typeId}")
+    public ResponseEntity<AnimalDto> deleteAnimalTypeInAnimal(@PathVariable("animalId") Long animalId,
+                                                              @PathVariable("typeId") Long typeId) throws NotFoundException, BadRequestException {
+        return ResponseEntity.ok(convertToDto(animalService.deleteAnimalTypeInAnimal(animalId, typeId)));
     }
 
     private AnimalDto convertToDto(Animal animal) {

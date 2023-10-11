@@ -23,7 +23,14 @@ public enum Message {
     ACCOUNT_ASSOCIATION("Account is associated with an animal"),
     LOCATION_ASSOCIATION("Location is associated with an animal"),
     ANIMAL_ASSOCIATION("Animal is associated with visited locations"),
-    ANIMAL_TYPE_ASSOCIATION("Animal is associated with animal type")
+    ANIMAL_TYPE_ASSOCIATION("Animal is associated with animal type"),
+    ANIMAL_TYPES_CONTAIN_NEW_ANIMAL_TYPE("The animal with typeId already has an animal type with animalId"),
+    LAST_ANIMAL_TYPE("An animal has only one type and that is the type with typeId"),
+    ANIMAL_IS_DEAD("The animal has lifeStatus = \"DEAD\""),
+    CHIPPING_LOCATION_IS_VISITED_LOCATION("An attempt to add a location point equal to the chipping point."),
+    ANIMAL_IN_CHIPPING_LOCATION("The animal is at the chipping point and has not moved anywhere"),
+    ANIMAL_IS_ALREADY_LOCATED("An attempt to add a location point where an animal is already located"),
+    ANIMAL_VISITED_LOCATION_NOT_FOUND("Animal visited location not found")
     ;
 
     private final String info;

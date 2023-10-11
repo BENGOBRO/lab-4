@@ -15,18 +15,21 @@ import java.util.List;
 public interface AnimalService {
     Animal create(@Valid AnimalDto animalDto) throws ConflictException, NotFoundException, BadRequestException;
 
-    Animal get(@NotNull @Positive Long id) throws NotFoundException;
+    Animal get(@NotNull @Positive Long animalId) throws NotFoundException;
 
-    Animal update(@NotNull @Positive Long id, @Valid AnimalDto animal) throws NotFoundException, BadRequestException;
+    Animal update(@NotNull @Positive Long animalId, @Valid AnimalDto animal) throws NotFoundException, BadRequestException;
 
-    void delete(@NotNull @Positive Long id) throws NotFoundException, BadRequestException;
+    void delete(@NotNull @Positive Long animalId) throws NotFoundException, BadRequestException;
 
     List<Animal> search(LocalDateTime startDateTime, LocalDateTime endDateTime,
                         @Positive Integer chipperId, @Positive Long chippingLocationId,
                         String lifeStatus, String gender,
                         @Min(0) Integer from, @Min(1) Integer size);
 
-    Animal addAnimalTypeToAnimal(@NotNull @Positive Long animalId, @NotNull @Positive Long typeId);
+    Animal addAnimalTypeToAnimal(@NotNull @Positive Long animalId, @NotNull @Positive Long typeId) throws NotFoundException, ConflictException;
 
-    Animal updateAnimalTypesInAnimal(@NotNull @Positive Long animalId, @Valid TypeDto typeDto);
+    Animal updateAnimalTypeInAnimal(@NotNull @Positive Long animalId, @Valid TypeDto typeDto) throws NotFoundException, ConflictException;
+
+    Animal deleteAnimalTypeInAnimal(@NotNull @Positive Long animalId, @NotNull @Positive Long typeId) throws NotFoundException, BadRequestException;
 }
+

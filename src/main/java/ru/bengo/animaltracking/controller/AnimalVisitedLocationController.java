@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.bengo.animaltracking.dto.AnimalVisitedLocationDto;
 import ru.bengo.animaltracking.entity.AnimalVisitedLocation;
+import ru.bengo.animaltracking.exception.BadRequestException;
 import ru.bengo.animaltracking.exception.NotFoundException;
 import ru.bengo.animaltracking.service.AnimalVisitedLocationService;
 
@@ -23,7 +24,7 @@ public class AnimalVisitedLocationController {
 
     @PostMapping("/{pointId}")
     public ResponseEntity<AnimalVisitedLocationDto> createAnimalVisitedLocation(@PathVariable Long animalId,
-                                                                          @PathVariable Long pointId) throws NotFoundException {
+                                                                          @PathVariable Long pointId) throws NotFoundException, BadRequestException {
         return ResponseEntity.status(HttpStatus.CREATED).body(convertToDto(animalVisitedLocationService.create(animalId, pointId)));
     }
 
@@ -42,7 +43,7 @@ public class AnimalVisitedLocationController {
     @PutMapping
     public ResponseEntity<AnimalVisitedLocationDto> updateAnimalVisitedLocation(
             @PathVariable Long animalId,
-            @RequestBody AnimalVisitedLocationDto animalVisitedLocationDto) {
+            @RequestBody AnimalVisitedLocationDto animalVisitedLocationDto) throws NotFoundException, BadRequestException {
         return ResponseEntity.ok(convertToDto(animalVisitedLocationService.update(animalId, animalVisitedLocationDto)));
     }
 
