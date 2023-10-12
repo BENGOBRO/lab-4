@@ -28,7 +28,7 @@ public class LocationServiceImpl implements LocationService {
             throw new ConflictException(Message.LOCATION_EXIST.getInfo());
         }
 
-        return locationRepository.save(convertToEntity(locationDto));
+        return locationRepository.save(convertToEntity(locationDto, new Location()));
     }
 
     @Override
@@ -39,22 +39,18 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public Location update(@Valid LocationDto locationDto, @NotNull @Positive Long id) throws ConflictException, NotFoundException {
-        locationRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(Message.LOCATION_NOT_FOUND.getInfo()));
+        var location = get(id);
 
         if (isLocationWithLatitudeAndLongitudeExist(locationDto.latitude(), locationDto.longitude())) {
             throw new ConflictException(Message.LOCATION_EXIST.getInfo());
         }
 
-        Location location = convertToEntity(locationDto);
-        location.setId(id);
-        return locationRepository.save(location);
+        return locationRepository.save(convertToEntity(locationDto, location));
     }
 
     @Override
     public void delete(@NotNull @Positive Long id) throws NotFoundException, BadRequestException {
-        Location location =locationRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(Message.LOCATION_NOT_FOUND.getInfo()));
+        var location = get(id);
 
         if (!location.getAnimals().isEmpty()) {
             throw new BadRequestException(Message.LOCATION_ASSOCIATION.getInfo());
@@ -67,10 +63,9 @@ public class LocationServiceImpl implements LocationService {
         return locationRepository.findByLatitudeAndLongitude(latitude, longitude).isPresent();
     }
 
-    private Location convertToEntity(LocationDto locationDto) {
-        return Location.builder()
-                .latitude(locationDto.latitude())
-                .longitude(locationDto.longitude())
-                .build();
+    private Location convertToEntity(LocationDto locationDto, Location location) {
+        location.setLatitude(locationDto.latitude());
+        location.setLongitude(locationDto.longitude());
+        return location;
     }
 }

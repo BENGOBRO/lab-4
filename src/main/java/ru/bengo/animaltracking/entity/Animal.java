@@ -62,7 +62,7 @@ public class Animal {
 
     @OneToMany(mappedBy = "animal")
     @ToString.Exclude
-    private List<AnimalVisitedLocation> visitedLocations;
+    private List<VisitedLocation> visitedLocations;
 
     private Date deathDateTime;
 

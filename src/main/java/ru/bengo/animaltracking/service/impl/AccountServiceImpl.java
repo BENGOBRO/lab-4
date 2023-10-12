@@ -42,9 +42,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
             throw new ConflictException(Message.ACCOUNT_EXIST.getInfo());
         }
 
-        Account account = convertToEntity(accountDto);
-        account.setPassword(passwordEncoder.encode(account.getPassword()));
-        return accountRepository.save(account);
+        return accountRepository.save(convertToEntity(accountDto, new Account()));
     }
 
     @Override
@@ -66,9 +64,9 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
     @Override
     public Account update(@Valid AccountDto accountDto,@NotNull @Positive Integer id) throws ForbiddenException, ConflictException {
-        String email = accountDto.email();
-        accountRepository.findById(id)
+        var account =accountRepository.findById(id)
                 .orElseThrow(() -> new ForbiddenException(Message.ACCOUNT_NOT_FOUND.getInfo()));
+        var email = accountDto.email();
 
         if (!isUserUpdatingTheirAccount(id)) {
             throw new ForbiddenException(Message.NO_ACCESS.getInfo());
@@ -77,15 +75,12 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
             throw new ConflictException(Message.ACCOUNT_EXIST.getInfo());
         }
 
-        Account account = convertToEntity(accountDto);
-        account.setId(id);
-        account.setPassword(passwordEncoder.encode(account.getPassword()));
-        return accountRepository.save(account);
+        return accountRepository.save(convertToEntity(accountDto, account));
     }
 
     @Override
     public void delete(@NotNull @Positive Integer id) throws ForbiddenException, BadRequestException {
-        Account account =accountRepository.findById(id)
+        var account =accountRepository.findById(id)
                 .orElseThrow(() -> new ForbiddenException(Message.ACCOUNT_NOT_FOUND.getInfo()));
 
         if (!isUserUpdatingTheirAccount(id)) {
@@ -136,12 +131,11 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         return false;
     }
 
-    private Account convertToEntity(AccountDto accountDto) {
-        return Account.builder()
-                .firstName(accountDto.firstName())
-                .lastName(accountDto.lastName())
-                .email(accountDto.email())
-                .password(accountDto.password())
-                .build();
+    private Account convertToEntity(AccountDto accountDto, Account account) {
+        account.setFirstName(accountDto.firstName());
+        account.setLastName(accountDto.lastName());
+        account.setEmail(accountDto.email());
+        account.setPassword(passwordEncoder.encode(accountDto.password()));
+        return account;
     }
 }

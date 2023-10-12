@@ -30,7 +30,9 @@ public enum Message {
     CHIPPING_LOCATION_IS_VISITED_LOCATION("An attempt to add a location point equal to the chipping point."),
     ANIMAL_IN_CHIPPING_LOCATION("The animal is at the chipping point and has not moved anywhere"),
     ANIMAL_IS_ALREADY_LOCATED("An attempt to add a location point where an animal is already located"),
-    ANIMAL_VISITED_LOCATION_NOT_FOUND("Animal visited location not found")
+    ANIMAL_VISITED_LOCATION_NOT_FOUND("Animal visited location not found"),
+    FIRST_VISITED_POINT_TO_CHIPPING_POINT("Updating the first visited point to the chipping point"),
+    SAME_POINT("Updating a point to the same point")
     ;
 
     private final String info;

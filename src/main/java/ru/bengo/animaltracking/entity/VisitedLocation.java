@@ -2,19 +2,18 @@ package ru.bengo.animaltracking.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import ru.bengo.animaltracking.dto.AnimalDto;
 
 import java.util.Date;
 
 @Entity
-@Table(name = "animal_visited_locations")
+@Table(name = "visited_locations")
 @Getter
 @Setter
 @Builder
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class AnimalVisitedLocation {
+public class VisitedLocation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

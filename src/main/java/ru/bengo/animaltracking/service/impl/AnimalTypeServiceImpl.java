@@ -27,7 +27,8 @@ public class AnimalTypeServiceImpl implements AnimalTypeService {
         if (isAnimalTypeWithTypeExist(animalTypeDto.type())) {
             throw new ConflictException(Message.ANIMAL_TYPE_EXIST.getInfo());
         }
-        return animalTypeRepository.save(convertToEntity(animalTypeDto));
+
+        return animalTypeRepository.save(convertToEntity(animalTypeDto, new AnimalType()));
     }
 
     @Override
@@ -38,22 +39,18 @@ public class AnimalTypeServiceImpl implements AnimalTypeService {
 
     @Override
     public AnimalType update(Long id, AnimalTypeDto animalTypeDto) throws NotFoundException, ConflictException {
-        animalTypeRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo()));
+        var animalType = get(id);
 
         if (isAnimalTypeWithTypeExist(animalTypeDto.type())) {
             throw new ConflictException(Message.ANIMAL_TYPE_EXIST.getInfo());
         }
 
-        AnimalType animalType = convertToEntity(animalTypeDto);
-        animalType.setId(id);
-        return animalTypeRepository.save(animalType);
+        return animalTypeRepository.save(convertToEntity(animalTypeDto, animalType));
     }
 
     @Override
     public void delete(@NotNull @Positive Long id) throws NotFoundException, BadRequestException {
-        AnimalType animalType = animalTypeRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo()));
+        var animalType = get(id);
 
         if (!animalType.getAnimals().isEmpty()) {
             throw new BadRequestException(Message.ANIMAL_TYPE_ASSOCIATION.getInfo());
@@ -66,9 +63,8 @@ public class AnimalTypeServiceImpl implements AnimalTypeService {
         return animalTypeRepository.findByType(type).isPresent();
     }
 
-    private AnimalType convertToEntity(AnimalTypeDto animalTypeDto) {
-        return AnimalType.builder()
-                .type(animalTypeDto.type())
-                .build();
+    private AnimalType convertToEntity(AnimalTypeDto animalTypeDto, AnimalType animalType) {
+        animalType.setType(animalTypeDto.type());
+        return animalType;
     }
 }

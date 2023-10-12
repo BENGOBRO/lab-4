@@ -7,9 +7,8 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class AnimalVisitedLocationDto {
-        @NotNull
-        @Positive
+public class VisitedLocationDto {
+
         private Long id;
 
         private Date dateTimeOfVisitLocationPoint;

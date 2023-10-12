@@ -3,9 +3,6 @@ package ru.bengo.animaltracking.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,16 +11,16 @@ import ru.bengo.animaltracking.dto.AnimalDto;
 import ru.bengo.animaltracking.dto.TypeDto;
 import ru.bengo.animaltracking.entity.Animal;
 import ru.bengo.animaltracking.entity.AnimalType;
-import ru.bengo.animaltracking.entity.AnimalVisitedLocation;
-import ru.bengo.animaltracking.exception.*;
+import ru.bengo.animaltracking.entity.VisitedLocation;
+import ru.bengo.animaltracking.exception.BadRequestException;
+import ru.bengo.animaltracking.exception.ConflictException;
+import ru.bengo.animaltracking.exception.NotFoundException;
 import ru.bengo.animaltracking.service.AnimalService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/animals")
@@ -92,7 +89,7 @@ public class AnimalController {
 
     private AnimalDto convertToDto(Animal animal) {
         List<Long> animalTypes = animal.getAnimalTypes().stream().map(AnimalType::getId).toList();
-        List<Long> visitedLocations = Optional.ofNullable(animal.getVisitedLocations()).orElse(new ArrayList<>()).stream().map(AnimalVisitedLocation::getId).toList();
+        List<Long> visitedLocations = Optional.ofNullable(animal.getVisitedLocations()).orElse(new ArrayList<>()).stream().map(VisitedLocation::getId).toList();
         AnimalDto animalDto = modelMapper.map(animal, AnimalDto.class);
         animalDto.setAnimalTypesIds(animalTypes);
         animalDto.setVisitedLocationsIds(visitedLocations);
