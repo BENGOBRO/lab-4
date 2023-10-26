@@ -14,13 +14,16 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-import ru.bengo.animaltracking.dto.AccountDto;
-import ru.bengo.animaltracking.entity.Account;
-import ru.bengo.animaltracking.exception.*;
-import ru.bengo.animaltracking.model.Message;
-import ru.bengo.animaltracking.model.User;
-import ru.bengo.animaltracking.repository.AccountRepository;
+import ru.bengo.animaltracking.api.dto.AccountDto;
+import ru.bengo.animaltracking.api.exception.BadRequestException;
+import ru.bengo.animaltracking.api.exception.ConflictException;
+import ru.bengo.animaltracking.api.exception.ForbiddenException;
+import ru.bengo.animaltracking.api.exception.NotFoundException;
+import ru.bengo.animaltracking.api.model.Message;
+import ru.bengo.animaltracking.api.model.User;
 import ru.bengo.animaltracking.service.AccountService;
+import ru.bengo.animaltracking.store.entity.Account;
+import ru.bengo.animaltracking.store.repository.AccountRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,18 +38,21 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     @Override
-    public Account register(@Valid AccountDto accountDto) throws ConflictException {
-        String email = accountDto.email();
-
-        if (isEmailExist(email)) {
-            throw new ConflictException(Message.ACCOUNT_EXIST.getInfo());
+    public Account register(@Valid AccountDto accountDto) {
+        accountRepository
+                .findAccountByEmail(accountDto.getEmail())
+                .ifPresent((project) -> {
+                    throw new ConflictException(Message.ACCOUNT_EXIST.getInfo());
+                });
+        if (accountDto.getPassword().isEmpty()) {
+            throw new BadRequestException(Message.NO_PASSWORD.getInfo());
         }
 
         return accountRepository.save(convertToEntity(accountDto, new Account()));
     }
 
     @Override
-    public Account get(@NotNull @Positive Integer id) throws NotFoundException {
+    public Account get(@NotNull @Positive Integer id) {
         return accountRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(Message.ACCOUNT_NOT_FOUND.getInfo()));
     }
@@ -63,12 +69,15 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     }
 
     @Override
-    public Account update(@Valid AccountDto accountDto,@NotNull @Positive Integer id) throws ForbiddenException, ConflictException {
-        var account =accountRepository.findById(id)
+    public Account update(@Valid AccountDto accountDto,@NotNull @Positive Integer id) {
+        var account = accountRepository.findById(id)
                 .orElseThrow(() -> new ForbiddenException(Message.ACCOUNT_NOT_FOUND.getInfo()));
-        var email = accountDto.email();
+        var email = accountDto.getEmail();
 
-        if (!isUserUpdatingTheirAccount(id)) {
+        if (accountDto.getPassword().isEmpty()) {
+            throw new BadRequestException(Message.NO_PASSWORD.getInfo());
+        }
+        if (isUserUpdatingForeignAccount(id)) {
             throw new ForbiddenException(Message.NO_ACCESS.getInfo());
         }
         if (!isEmailExist(email, id)) {
@@ -79,11 +88,11 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     }
 
     @Override
-    public void delete(@NotNull @Positive Integer id) throws ForbiddenException, BadRequestException {
+    public void delete(@NotNull @Positive Integer id) {
         var account =accountRepository.findById(id)
                 .orElseThrow(() -> new ForbiddenException(Message.ACCOUNT_NOT_FOUND.getInfo()));
 
-        if (!isUserUpdatingTheirAccount(id)) {
+        if (isUserUpdatingForeignAccount(id)) {
             throw new ForbiddenException(Message.NO_ACCESS.getInfo());
         }
         if (!account.getAnimals().isEmpty()) {
@@ -94,7 +103,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) {
         Optional<Account> foundAccount = accountRepository.findAccountByEmail(username);
 
         if (foundAccount.isEmpty()) {
@@ -102,11 +111,6 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         }
 
         return new User(foundAccount.get());
-    }
-
-    private boolean isEmailExist(String email) {
-        Optional<Account> foundAccount = accountRepository.findAccountByEmail(email);
-        return foundAccount.isPresent();
     }
 
     private boolean isEmailExist(String email, Integer id) {
@@ -120,22 +124,17 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         return true;
     }
 
-    private boolean isUserUpdatingTheirAccount(Integer id) {
+    private boolean isUserUpdatingForeignAccount(Integer id) {
         Optional<Account> foundAccount = accountRepository.findById(id);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if (foundAccount.isPresent()) {
-            return foundAccount.get().getEmail().equals(auth.getName());
-        }
-
-        return false;
+        return foundAccount.map(account -> !account.getEmail().equals(auth.getName())).orElse(true);
     }
 
     private Account convertToEntity(AccountDto accountDto, Account account) {
-        account.setFirstName(accountDto.firstName());
-        account.setLastName(accountDto.lastName());
-        account.setEmail(accountDto.email());
-        account.setPassword(passwordEncoder.encode(accountDto.password()));
+        account.setFirstName(accountDto.getFirstName());
+        account.setLastName(accountDto.getLastName());
+        account.setEmail(accountDto.getEmail());
+        account.setPassword(passwordEncoder.encode(accountDto.getPassword()));
         return account;
     }
 }

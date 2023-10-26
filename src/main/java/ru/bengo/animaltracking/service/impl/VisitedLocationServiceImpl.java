@@ -7,15 +7,16 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.bengo.animaltracking.dto.VisitedLocationUpdateDto;
-import ru.bengo.animaltracking.entity.Animal;
-import ru.bengo.animaltracking.entity.Location;
-import ru.bengo.animaltracking.entity.VisitedLocation;
-import ru.bengo.animaltracking.exception.BadRequestException;
-import ru.bengo.animaltracking.exception.NotFoundException;
-import ru.bengo.animaltracking.model.LifeStatus;
-import ru.bengo.animaltracking.model.Message;
-import ru.bengo.animaltracking.repository.VisitedLocationRepository;
+import org.springframework.validation.annotation.Validated;
+import ru.bengo.animaltracking.api.dto.VisitedLocationUpdateDto;
+import ru.bengo.animaltracking.store.entity.Animal;
+import ru.bengo.animaltracking.store.entity.Location;
+import ru.bengo.animaltracking.store.entity.VisitedLocation;
+import ru.bengo.animaltracking.api.exception.BadRequestException;
+import ru.bengo.animaltracking.api.exception.NotFoundException;
+import ru.bengo.animaltracking.api.model.LifeStatus;
+import ru.bengo.animaltracking.api.model.Message;
+import ru.bengo.animaltracking.store.repository.VisitedLocationRepository;
 import ru.bengo.animaltracking.service.AnimalService;
 import ru.bengo.animaltracking.service.LocationService;
 import ru.bengo.animaltracking.service.VisitedLocationService;
@@ -24,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service
+@Validated
 @RequiredArgsConstructor
 @Slf4j
 public class VisitedLocationServiceImpl implements VisitedLocationService {
@@ -33,7 +35,7 @@ public class VisitedLocationServiceImpl implements VisitedLocationService {
     private final AnimalService animalService;
 
     @Override
-    public VisitedLocation create(@NotNull @Positive Long animalId, @NotNull @Positive Long locationId) throws NotFoundException, BadRequestException {
+    public VisitedLocation create(@NotNull @Positive Long animalId, @NotNull @Positive Long locationId) {
         var location = locationService.get(locationId);
         var animal = animalService.get(animalId);
         var visitedLocations = animal.getVisitedLocations();
@@ -65,7 +67,8 @@ public class VisitedLocationServiceImpl implements VisitedLocationService {
     }
 
     @Override
-    public VisitedLocation update(@NotNull @Positive Long animalId, @Valid VisitedLocationUpdateDto visitedLocationUpdateDto) throws NotFoundException, BadRequestException {
+    public VisitedLocation update(@NotNull @Positive Long animalId,
+                                  @Valid VisitedLocationUpdateDto visitedLocationUpdateDto) {
         var animal = animalService.get(animalId);
         var visitedLocation = visitedLocationRepository.findById(visitedLocationUpdateDto.getVisitedLocationPointId())
                 .orElseThrow(() -> new NotFoundException(Message.ANIMAL_VISITED_LOCATION_NOT_FOUND.getInfo()));
@@ -91,7 +94,7 @@ public class VisitedLocationServiceImpl implements VisitedLocationService {
     }
 
     @Override
-    public void delete(@NotNull @Positive Long animalId, @NotNull @Positive Long visitedLocationId) throws NotFoundException {
+    public void delete(@NotNull @Positive Long animalId, @NotNull @Positive Long visitedLocationId) {
 
         var animal = animalService.get(animalId);
         var visitedLocation = visitedLocationRepository.findById(visitedLocationId)
