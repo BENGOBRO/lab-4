@@ -1,22 +1,19 @@
 package ru.bengo.animaltracking.api.dto.mapper;
 
-import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.stereotype.Component;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.bengo.animaltracking.api.dto.LocationDto;
 import ru.bengo.animaltracking.store.entity.Location;
 
-@Component
-@RequiredArgsConstructor
-public class LocationMapper {
+@Mapper(componentModel = "spring")
+public interface LocationMapper {
 
-    private final ModelMapper modelMapper;
+    LocationDto toDto(Location location);
 
-    public LocationDto toDto(Location location) {
-        return modelMapper.map(location, LocationDto.class);
-    }
+    Location toEntity(LocationDto locationDto);
 
-    public Location toEntity(LocationDto locationDto) {
-        return modelMapper.map(locationDto, Location.class);
-    }
+    @BeanMapping(nullValuePropertyMappingStrategy =  NullValuePropertyMappingStrategy.IGNORE)
+    void updateEntity(LocationDto locationDto, @MappingTarget Location location);
 }

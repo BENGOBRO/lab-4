@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.bengo.animaltracking.api.dto.AccountDto;
+import ru.bengo.animaltracking.api.dto.mapper.AccountMapper;
 import ru.bengo.animaltracking.api.exception.BadRequestException;
 import ru.bengo.animaltracking.api.exception.ConflictException;
 import ru.bengo.animaltracking.api.exception.ForbiddenException;
@@ -34,8 +35,8 @@ import java.util.Optional;
 public class AccountServiceImpl implements AccountService, UserDetailsService {
 
     private final AccountRepository accountRepository;
-
     private final BCryptPasswordEncoder passwordEncoder;
+    private final AccountMapper accountMapper;
 
     @Override
     public Account register(@Valid AccountDto accountDto) {
@@ -47,8 +48,8 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         if (accountDto.getPassword().isEmpty()) {
             throw new BadRequestException(Message.NO_PASSWORD.getInfo());
         }
-
-        return accountRepository.save(convertToEntity(accountDto, new Account()));
+        accountDto.setPassword(passwordEncoder.encode(accountDto.getPassword()));
+        return accountRepository.save(accountMapper.toEntity(accountDto));
     }
 
     @Override
@@ -83,13 +84,14 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         if (!isEmailExist(email, id)) {
             throw new ConflictException(Message.ACCOUNT_EXIST.getInfo());
         }
-
-        return accountRepository.save(convertToEntity(accountDto, account));
+        accountDto.setPassword(passwordEncoder.encode(accountDto.getPassword()));
+        accountMapper.updateEntity(accountDto, account);
+        return accountRepository.save(account);
     }
 
     @Override
     public void delete(@NotNull @Positive Integer id) {
-        var account =accountRepository.findById(id)
+        var account = accountRepository.findById(id)
                 .orElseThrow(() -> new ForbiddenException(Message.ACCOUNT_NOT_FOUND.getInfo()));
 
         if (isUserUpdatingForeignAccount(id)) {
@@ -128,13 +130,5 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         Optional<Account> foundAccount = accountRepository.findById(id);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return foundAccount.map(account -> !account.getEmail().equals(auth.getName())).orElse(true);
-    }
-
-    private Account convertToEntity(AccountDto accountDto, Account account) {
-        account.setFirstName(accountDto.getFirstName());
-        account.setLastName(accountDto.getLastName());
-        account.setEmail(accountDto.getEmail());
-        account.setPassword(passwordEncoder.encode(accountDto.getPassword()));
-        return account;
     }
 }

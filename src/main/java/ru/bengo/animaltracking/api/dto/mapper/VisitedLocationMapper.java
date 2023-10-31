@@ -1,7 +1,9 @@
 package ru.bengo.animaltracking.api.dto.mapper;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeMap;
 import org.springframework.stereotype.Component;
 import ru.bengo.animaltracking.api.dto.VisitedLocationDto;
 import ru.bengo.animaltracking.store.entity.VisitedLocation;
@@ -18,5 +20,13 @@ public class VisitedLocationMapper {
 
     public VisitedLocation toEntity(VisitedLocationDto visitedLocationDto) {
         return modelMapper.map(visitedLocationDto, VisitedLocation.class);
+    }
+
+    @PostConstruct
+    public void setupMapper() {
+        TypeMap<VisitedLocation, VisitedLocationDto> propertyMapperAnimalLocation = modelMapper.createTypeMap(VisitedLocation.class, VisitedLocationDto.class);
+        propertyMapperAnimalLocation.addMappings(
+                x -> x.map(src -> src.getLocation().getId(), VisitedLocationDto::setLocationPointId)
+        );
     }
 }

@@ -6,8 +6,11 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
 import org.springframework.stereotype.Component;
 import ru.bengo.animaltracking.api.dto.AnimalDto;
+import ru.bengo.animaltracking.api.model.Gender;
+import ru.bengo.animaltracking.api.model.LifeStatus;
 import ru.bengo.animaltracking.store.entity.*;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,20 +39,37 @@ public class AnimalMapper {
         return animal;
     }
 
+    public void toEntity(AnimalDto animalDto, Location chippingLocation,
+                         Account chipperAccount, Animal animal) {
+        modelMapper.map(animalDto, animal);
+        animal.setChippingLocation(chippingLocation);
+        animal.setChipper(chipperAccount);
+    }
+
     @PostConstruct
     public void setupMapper() {
-        TypeMap<Animal, AnimalDto> propertyMapperAnimal = modelMapper.createTypeMap(Animal.class, AnimalDto.class);
-        propertyMapperAnimal.addMappings(
+        modelMapper.createTypeMap(Animal.class, AnimalDto.class).addMappings(
                 x -> x.skip(AnimalDto::setAnimalTypesIds)
-        );
-        propertyMapperAnimal.addMappings(
+        ).addMappings(
                 x -> x.skip(AnimalDto::setVisitedLocationsIds)
-        );
-        propertyMapperAnimal.addMappings(
+        ).addMappings(
                 x -> x.map(src -> src.getChipper().getId(), AnimalDto::setChipperId)
-        );
-        propertyMapperAnimal.addMappings(
+        ).addMappings(
                 x -> x.map(src -> src.getChippingLocation().getId(), AnimalDto::setChippingLocationId)
         );
+
+//        modelMapper.createTypeMap(AnimalDto.class, Animal.class).addMappings(
+//                x -> x.skip(Animal::setAnimalTypes)
+//        ).addMappings(
+//                x -> x.skip(Animal::setVisitedLocations)
+//        ).addMappings(
+//                x -> x.skip(Animal::setChipper)
+//        ).addMappings(
+//                x -> x.skip(Animal::setChippingLocation)
+//        ).addMappings(
+//                x -> x.map(src -> Gender.valueOf(src.getGender()), Animal::setGender)
+//        ).addMappings(
+//                x -> x.map(src -> LifeStatus.valueOf(src.getLifeStatus()), Animal::setLifeStatus)
+//        );
     }
 }

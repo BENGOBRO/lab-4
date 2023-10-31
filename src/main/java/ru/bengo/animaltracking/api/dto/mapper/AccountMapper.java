@@ -1,19 +1,17 @@
 package ru.bengo.animaltracking.api.dto.mapper;
 
-import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.stereotype.Component;
+import org.mapstruct.*;
 import ru.bengo.animaltracking.api.dto.AccountDto;
 import ru.bengo.animaltracking.store.entity.Account;
 
-@Component
-@RequiredArgsConstructor
-public class AccountMapper {
+@Mapper(componentModel = "spring")
+public interface AccountMapper {
 
-    private final ModelMapper modelMapper;
+    AccountDto toDto(Account account);
 
-    public AccountDto toDto(Account account) {
-        return modelMapper.map(account, AccountDto.class);
-    }
+    Account toEntity(AccountDto accountDto);
+
+    @BeanMapping(nullValuePropertyMappingStrategy =  NullValuePropertyMappingStrategy.IGNORE)
+    void updateEntity(AccountDto accountDto, @MappingTarget Account account);
 
 }

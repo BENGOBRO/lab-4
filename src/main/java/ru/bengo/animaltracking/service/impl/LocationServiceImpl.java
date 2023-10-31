@@ -49,8 +49,7 @@ public class LocationServiceImpl implements LocationService {
             throw new ConflictException(Message.LOCATION_EXIST.getInfo());
         }
 
-        location.setLatitude(locationDto.getLatitude());
-        location.setLongitude(locationDto.getLongitude());
+        locationMapper.updateEntity(locationDto, location);
         return locationRepository.save(location);
     }
 

@@ -1,22 +1,17 @@
 package ru.bengo.animaltracking.api.dto.mapper;
 
-import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.springframework.stereotype.Component;
+import org.mapstruct.*;
+import org.mapstruct.factory.Mappers;
 import ru.bengo.animaltracking.api.dto.AnimalTypeDto;
 import ru.bengo.animaltracking.store.entity.AnimalType;
 
-@Component
-@RequiredArgsConstructor
-public class AnimalTypeMapper{
+@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR)
+public interface AnimalTypeMapper {
 
-    private final ModelMapper modelMapper;
+    AnimalTypeDto toDto(AnimalType animalType);
 
-    public AnimalTypeDto toDto(AnimalType animalType) {
-        return modelMapper.map(animalType, AnimalTypeDto.class);
-    }
+    AnimalType toEntity(AnimalTypeDto animalTypeDto);
 
-    public AnimalType toEntity(AnimalTypeDto animalTypeDto) {
-        return modelMapper.map(animalTypeDto, AnimalType.class);
-    }
+    @BeanMapping(nullValuePropertyMappingStrategy =  NullValuePropertyMappingStrategy.IGNORE)
+    void updateEntity(AnimalTypeDto animalTypeDto, @MappingTarget AnimalType animalType);
 }

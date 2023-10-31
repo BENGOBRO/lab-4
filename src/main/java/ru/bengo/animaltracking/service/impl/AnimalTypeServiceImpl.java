@@ -1,23 +1,24 @@
 package ru.bengo.animaltracking.service.impl;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.bengo.animaltracking.api.dto.AnimalTypeDto;
 import ru.bengo.animaltracking.api.dto.mapper.AnimalTypeMapper;
-import ru.bengo.animaltracking.store.entity.AnimalType;
 import ru.bengo.animaltracking.api.exception.BadRequestException;
 import ru.bengo.animaltracking.api.exception.ConflictException;
 import ru.bengo.animaltracking.api.exception.NotFoundException;
 import ru.bengo.animaltracking.api.model.Message;
-import ru.bengo.animaltracking.store.repository.AnimalTypeRepository;
 import ru.bengo.animaltracking.service.AnimalTypeService;
+import ru.bengo.animaltracking.store.entity.AnimalType;
+import ru.bengo.animaltracking.store.repository.AnimalTypeRepository;
 
 @Service
 @Validated
+@Slf4j
 @RequiredArgsConstructor
 public class AnimalTypeServiceImpl implements AnimalTypeService {
 
@@ -25,7 +26,7 @@ public class AnimalTypeServiceImpl implements AnimalTypeService {
     private final AnimalTypeMapper animalTypeMapper;
 
     @Override
-    public AnimalType create(@Valid AnimalTypeDto animalTypeDto) {
+    public AnimalType create(AnimalTypeDto animalTypeDto) {
         isAnimalTypeExist(animalTypeDto.getType());
         return animalTypeRepository.save(animalTypeMapper.toEntity(animalTypeDto));
     }
@@ -39,8 +40,8 @@ public class AnimalTypeServiceImpl implements AnimalTypeService {
     @Override
     public AnimalType update(Long id, AnimalTypeDto animalTypeDto) {
         var animalType = get(id);
-        isAnimalTypeExist(animalType.getType());
-        animalType.setType(animalTypeDto.getType());
+        isAnimalTypeExist(animalTypeDto.getType());
+        animalTypeMapper.updateEntity(animalTypeDto, animalType);
         return animalTypeRepository.save(animalType);
     }
 

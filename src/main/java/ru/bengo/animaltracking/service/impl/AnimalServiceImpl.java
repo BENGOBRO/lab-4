@@ -6,28 +6,24 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.bengo.animaltracking.api.dto.AnimalDto;
 import ru.bengo.animaltracking.api.dto.TypeDto;
 import ru.bengo.animaltracking.api.dto.mapper.AnimalMapper;
-import ru.bengo.animaltracking.store.entity.Account;
-import ru.bengo.animaltracking.store.entity.Animal;
-import ru.bengo.animaltracking.store.entity.AnimalType;
-import ru.bengo.animaltracking.store.entity.Location;
 import ru.bengo.animaltracking.api.exception.BadRequestException;
 import ru.bengo.animaltracking.api.exception.ConflictException;
 import ru.bengo.animaltracking.api.exception.NotFoundException;
-import ru.bengo.animaltracking.api.model.Gender;
 import ru.bengo.animaltracking.api.model.LifeStatus;
 import ru.bengo.animaltracking.api.model.Message;
-import ru.bengo.animaltracking.store.repository.AnimalRepository;
 import ru.bengo.animaltracking.service.AccountService;
 import ru.bengo.animaltracking.service.AnimalService;
 import ru.bengo.animaltracking.service.AnimalTypeService;
 import ru.bengo.animaltracking.service.LocationService;
+import ru.bengo.animaltracking.store.entity.Animal;
+import ru.bengo.animaltracking.store.entity.AnimalType;
+import ru.bengo.animaltracking.store.repository.AnimalRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -46,7 +42,7 @@ public class AnimalServiceImpl implements AnimalService {
     private final LocationService locationService;
 
     @Override
-    public Animal create(@Valid AnimalDto animalDto) {
+    public Animal create(AnimalDto animalDto) {
         var animalTypesIds = animalDto.getAnimalTypesIds();
         if (animalTypesIds == null || animalTypesIds.isEmpty()) {
             throw new BadRequestException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo());
@@ -71,7 +67,7 @@ public class AnimalServiceImpl implements AnimalService {
 
 
     @Override
-    public Animal update(@NotNull @Positive Long animalId, @Valid AnimalDto animalDto) {
+    public Animal update(@NotNull @Positive Long animalId, AnimalDto animalDto) {
         var animal = get(animalId);
         var newChipper = accountService.get(animalDto.getChipperId());
         var newChippingLocation = locationService.get(animalDto.getChippingLocationId());
@@ -91,13 +87,7 @@ public class AnimalServiceImpl implements AnimalService {
             }
         }
 
-        animal.setWeight(animalDto.getWeight());
-        animal.setLength(animalDto.getLength());
-        animal.setHeight(animalDto.getHeight());
-        animal.setGender(Gender.valueOf(animalDto.getGender()));
-        animal.setLifeStatus(LifeStatus.valueOf(newLifeStatus));
-        animal.setChipper(newChipper);
-        animal.setChippingLocation(newChippingLocation);
+        animalMapper.toEntity(animalDto, newChippingLocation, newChipper, animal);
         return animalRepository.save(animal);
     }
 
@@ -137,7 +127,7 @@ public class AnimalServiceImpl implements AnimalService {
     }
 
     @Override
-    public Animal updateAnimalTypeInAnimal(@NotNull @Positive Long animalId, @Valid TypeDto typeDto) {
+    public Animal updateAnimalTypeInAnimal(@NotNull @Positive Long animalId, TypeDto typeDto) {
         Animal animal = get(animalId);
         AnimalType oldType = animalTypeService.get(typeDto.getOldTypeId());
         AnimalType newType = animalTypeService.get(typeDto.getNewTypeId());
