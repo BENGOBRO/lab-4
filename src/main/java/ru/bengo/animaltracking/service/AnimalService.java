@@ -16,7 +16,7 @@ public interface AnimalService {
 
     Animal get(@NotNull @Positive Long animalId);
 
-    Animal update(@NotNull @Positive Long animalId, @Valid AnimalDto animal);
+    Animal update(@NotNull @Positive Long animalId, AnimalDto animal);
 
     void delete(@NotNull @Positive Long animalId);
 
@@ -27,7 +27,7 @@ public interface AnimalService {
 
     Animal addAnimalTypeToAnimal(@NotNull @Positive Long animalId, @NotNull @Positive Long typeId);
 
-    Animal updateAnimalTypeInAnimal(@NotNull @Positive Long animalId, @Valid TypeDto typeDto);
+    Animal updateAnimalTypeInAnimal(@NotNull @Positive Long animalId, TypeDto typeDto);
 
     Animal deleteAnimalTypeInAnimal(@NotNull @Positive Long animalId, @NotNull @Positive Long typeId);
 }

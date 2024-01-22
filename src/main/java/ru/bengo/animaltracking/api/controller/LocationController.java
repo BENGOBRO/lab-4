@@ -37,7 +37,7 @@ public class LocationController {
     }
 
     @DeleteMapping("/{pointId}")
-    public ResponseEntity<?> deleteLocation(@PathVariable("pointId") Long id) {
+    public ResponseEntity<Void> deleteLocation(@PathVariable("pointId") Long id) {
         locationService.delete(id);
         return ResponseEntity.ok().build();
     }

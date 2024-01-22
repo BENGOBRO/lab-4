@@ -1,6 +1,5 @@
 package ru.bengo.animaltracking.service.impl;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -44,7 +43,8 @@ public class AnimalServiceImpl implements AnimalService {
     @Override
     public Animal create(AnimalDto animalDto) {
         var animalTypesIds = animalDto.getAnimalTypesIds();
-        if (animalTypesIds == null || animalTypesIds.isEmpty()) {
+        var isAnimalTypesExists = animalTypesIds == null || animalTypesIds.isEmpty();
+        if (isAnimalTypesExists) {
             throw new BadRequestException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo());
         }
         if (hasAnimalTypesDuplicates(animalTypesIds)) {
@@ -69,24 +69,30 @@ public class AnimalServiceImpl implements AnimalService {
     @Override
     public Animal update(@NotNull @Positive Long animalId, AnimalDto animalDto) {
         var animal = get(animalId);
-        var newChipper = accountService.get(animalDto.getChipperId());
-        var newChippingLocation = locationService.get(animalDto.getChippingLocationId());
+        var isAnimalDead = isDead(animal.getLifeStatus());
+        if (isAnimalDead) {
 
-        var newLifeStatus = animalDto.getLifeStatus();
-        if (isDead(animal.getLifeStatus())) {
-            if (newLifeStatus.equals(LifeStatus.ALIVE.name())) {
+            var newLifeStatus = animalDto.getLifeStatus();
+            var isNewStatusAlive = newLifeStatus.equals(LifeStatus.ALIVE.name());
+            if (isNewStatusAlive) {
                 throw new BadRequestException(Message.UPDATE_DEAD_TO_ALIVE.getInfo());
             }
         }
 
-        if (!animal.getVisitedLocations().isEmpty()) {
+        var isAnimalHasVisitedLocations = !animal.getVisitedLocations().isEmpty();
+        var newChippingLocation = locationService.get(animalDto.getChippingLocationId());
+        if (isAnimalHasVisitedLocations) {
+
             var firstVisitedLocationId = animal.getVisitedLocations().get(0).getId();
-            if (firstVisitedLocationId.equals(newChippingLocation.getId())) {
+            var isNewChippingLocationIdEqualsFirstVisitedLocation =
+                    firstVisitedLocationId.equals(newChippingLocation.getId());
+            if (isNewChippingLocationIdEqualsFirstVisitedLocation) {
                 throw new BadRequestException(
                         Message.NEW_CHIPPING_LOCATION_ID_EQUALS_FIRST_VISITED_LOCATION.getInfo());
             }
         }
 
+        var newChipper = accountService.get(animalDto.getChipperId());
         animalMapper.toEntity(animalDto, newChippingLocation, newChipper, animal);
         return animalRepository.save(animal);
     }
@@ -95,7 +101,8 @@ public class AnimalServiceImpl implements AnimalService {
     public void delete(@NotNull @Positive Long animalId) {
         Animal animal = get(animalId);
 
-        if (!animal.getVisitedLocations().isEmpty()) {
+        var isAnimalHasVisitedLocations = !animal.getVisitedLocations().isEmpty();
+        if (isAnimalHasVisitedLocations) {
             throw new BadRequestException(Message.ANIMAL_ASSOCIATION.getInfo());
         }
 
@@ -104,13 +111,16 @@ public class AnimalServiceImpl implements AnimalService {
 
     @Override
     public List<Animal> search(LocalDateTime startDateTime, LocalDateTime endDateTime,
-                                  @Positive Integer chipperId, @Positive Long chippingLocationId,
-                                  String lifeStatus, String gender,
-                                  @Min(0) Integer from, @Min(1) Integer size) {
+                               @Positive Integer chipperId, @Positive Long chippingLocationId,
+                               String lifeStatus, String gender,
+                               @Min(0) Integer from, @Min(1) Integer size) {
         PageRequest pageRequest = PageRequest.ofSize(size + from);
         List<Animal> foundAnimals = animalRepository.search(startDateTime, endDateTime, chipperId,
                 chippingLocationId, lifeStatus, gender, pageRequest);
-        return foundAnimals.stream().skip(from).toList();
+        return foundAnimals
+                .stream()
+                .skip(from)
+                .toList();
     }
 
     @Override
@@ -118,9 +128,12 @@ public class AnimalServiceImpl implements AnimalService {
         Animal animal = get(animalId);
         AnimalType animalType = animalTypeService.get(typeId);
         List<AnimalType> animalTypes = animal.getAnimalTypes();
-        if (animalTypes.contains(animalType)) {
+
+        var isAnimalContainsNewType = animalTypes.contains(animalType);
+        if (isAnimalContainsNewType) {
             throw new ConflictException(Message.ANIMAL_TYPES_CONTAIN_NEW_ANIMAL_TYPE.getInfo());
         }
+
         animalTypes.add(animalType);
         animal.setAnimalTypes(animalTypes);
         return animalRepository.save(animal);
@@ -129,15 +142,21 @@ public class AnimalServiceImpl implements AnimalService {
     @Override
     public Animal updateAnimalTypeInAnimal(@NotNull @Positive Long animalId, TypeDto typeDto) {
         Animal animal = get(animalId);
-        AnimalType oldType = animalTypeService.get(typeDto.getOldTypeId());
-        AnimalType newType = animalTypeService.get(typeDto.getNewTypeId());
         List<AnimalType> animalTypes = animal.getAnimalTypes();
-        if (!animalTypes.contains(oldType)) {
+        AnimalType oldType = animalTypeService.get(typeDto.getOldTypeId());
+
+        var isAnimalContainsOldType = animalTypes.contains(oldType);
+        if (!isAnimalContainsOldType) {
             throw new NotFoundException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo());
         }
-        if (animalTypes.contains(newType) || (animalTypes.contains(oldType) && animalTypes.contains(newType))) {
+
+        AnimalType newType = animalTypeService.get(typeDto.getNewTypeId());
+        var isAnimalContainsNewType = animalTypes.contains(newType)
+                || (animalTypes.contains(oldType) && animalTypes.contains(newType));
+        if (isAnimalContainsNewType) {
             throw new ConflictException(Message.ANIMAL_TYPES_CONTAIN_NEW_ANIMAL_TYPE.getInfo());
         }
+
         animalTypes.remove(oldType);
         animalTypes.add(newType);
         animal.setAnimalTypes(animalTypes);
@@ -149,12 +168,17 @@ public class AnimalServiceImpl implements AnimalService {
         Animal animal = get(animalId);
         AnimalType animalType = animalTypeService.get(typeId);
         List<AnimalType> animalTypes = animal.getAnimalTypes();
-        if (animalTypes.size() == 1 && animalTypes.get(0).equals(animalType)) {
+
+        var isLastAnimalType = animalTypes.size() == 1 && animalTypes.get(0).equals(animalType);
+        if (isLastAnimalType) {
             throw new BadRequestException(Message.LAST_ANIMAL_TYPE.getInfo());
         }
-        if (!animalTypes.contains(animalType)) {
+
+        var isAnimalContainsType = animalTypes.contains(animalType);
+        if (!isAnimalContainsType) {
             throw new NotFoundException(Message.ANIMAL_TYPE_NOT_FOUND.getInfo());
         }
+
         animalTypes.remove(animalType);
         animal.setAnimalTypes(animalTypes);
         return animalRepository.save(animal);
@@ -166,13 +190,14 @@ public class AnimalServiceImpl implements AnimalService {
 
     private List<AnimalType> getAnimalTypes(List<Long> animalTypesIds) throws NotFoundException {
         List<AnimalType> animalTypes = new ArrayList<>();
-        for (var id: animalTypesIds) {
-            animalTypes.add(animalTypeService.get(id));
-        }
+        animalTypesIds.forEach(id -> animalTypes.add(animalTypeService.get(id)));
         return animalTypes;
     }
 
     private boolean hasAnimalTypesDuplicates(List<Long> animalTypes) {
-        return animalTypes.stream().distinct().count() < animalTypes.size();
+        return animalTypes
+                .stream()
+                .distinct()
+                .count() < animalTypes.size();
     }
 }
