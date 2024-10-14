@@ -1,38 +1,46 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
-
 name: ci
 
+# Указывем, когда запускать pipeline
 on:
   push:
     branches: [ "main", "BENGOBRO-patch-1" ]
   pull_request:
     branches: [ "main", "BENGOBRO-patch-1" ]
 
+# Указываем уровень доступа в репозитории
 permissions:
   contents: read
 
+# Указываем задачи, которые будут выполняться при выполнении pipeline
 jobs:
+
+  # Задача build
   build:
+
+    # Образ, на котором будет выполняться задача
     runs-on: ubuntu-latest
+
+    # Шаги выполнения задачи
     steps:
+
+      # Шаг проверок от actions. Внутри происходят проверки версии git, репозитория; копирование репозитория в контейнер
       - name: Checkout
         uses: actions/checkout@v3
 
+      # Шаг установки JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: "17"
           distribution: "adopt"
 
+      # Шаг установки Gradle
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: 8.1.1
+
+      # Шаг сборки проекта через ./gradlew
       - name: Run build with Gradle Wrapper
         run:
-          ./gradlew build
+          ./gradlew clean build
