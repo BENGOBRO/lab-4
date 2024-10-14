@@ -3,9 +3,9 @@ name: ci
 # Указывем, когда запускать pipeline
 on:
   push:
-    branches: [ "main", "BENGOBRO-patch-1" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "main", "BENGOBRO-patch-1" ]
+    branches: [ "main" ]
 
 # Указываем уровень доступа в репозитории
 permissions:
@@ -44,3 +44,5 @@ jobs:
       - name: Run build with Gradle Wrapper
         run:
           ./gradlew clean build
+
+  build_docker_image:
