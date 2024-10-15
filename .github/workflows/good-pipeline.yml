@@ -103,8 +103,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Run command on remote server
+      - name: Connect to remote server
         run: |
           sshpass -p ${{ secrets.SSH_PRIVATE_KEY }} ssh -o StrictHostKeyChecking=no -p 22 ${{ secrets.SSH_USER}}@${{ secrets.SSH_HOST }}
         env:
           SSHPASS: ${{ secrets.SSH_PRIVATE_KEY}}
+
+      - name: Pull image
+        run: |
+          docker pull ${{ vars.DOCKERHUB_REPOSITORY }}:${{ vars.DOCKER_TAG_VERSION }}
+
+      - name: Run container
+        run: |
+          docker run ${{ vars.DOCKERHUB_REPOSITORY }}:${{ vars.DOCKER_TAG_VERSION }}
+
+      - name: Sto
