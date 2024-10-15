@@ -48,6 +48,9 @@ jobs:
   # Сборка и отправка в Docker Hub образа Docker
   Publish:
 
+    # Без задачи Test не будет исполняться задача Publish
+    needs: Test
+
     # Образ, на котором будет выполняться задача
     runs-on: ubuntu-latest
 
