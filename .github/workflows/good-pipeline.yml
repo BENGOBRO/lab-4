@@ -4,8 +4,6 @@ name: Good Pipeline
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 # Указываем уровень доступа в репозитории
 permissions:
@@ -23,7 +21,7 @@ jobs:
     # Шаги выполнения задачи
     steps:
 
-      # Шаг проверок от actions
+      # Шаг проверок от Github Аctions
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -57,7 +55,7 @@ jobs:
     # Шаги выполнения задачи
     steps:
 
-      # Шаг проверок от actions
+      # Шаг проверок от Github Аctions
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -96,27 +94,32 @@ jobs:
         run: |
           docker push ${{ vars.DOCKERHUB_REPOSITORY }}
 
+  # Задача загрузки образа на сервер
   Deploy:
+
+    # Без задач Test и Publish не будет исполняться задача Deploy
     needs: [Test, Publish]
+
     runs-on: ubuntu-latest
     steps:
+
+      # Шаг проверок от Github Аctions
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Шаг подключения к удаленному серверу
       - name: Connect to remote server
         run: |
           sshpass -p ${{ secrets.SSH_PRIVATE_KEY }} ssh -o StrictHostKeyChecking=no -p 22 ${{ secrets.SSH_USER}}@${{ secrets.SSH_HOST }}
         env:
           SSHPASS: ${{ secrets.SSH_PRIVATE_KEY}}
 
+      # Шаг загрузки образа из Docker Hub
       - name: Pull image
         run: |
           docker pull ${{ vars.DOCKERHUB_REPOSITORY }}:${{ vars.DOCKER_TAG_VERSION }}
 
+      # Шаг запуска контейнера
       - name: Run container
         run: |
           docker run ${{ vars.DOCKERHUB_REPOSITORY }}:${{ vars.DOCKER_TAG_VERSION }}
-
-      - name: Stop container
-        run: |
-          docker stop ${{ vars.DOCKERHUB_REPOSITORY }}:${{ vars.DOCKER_TAG_VERSION }}
