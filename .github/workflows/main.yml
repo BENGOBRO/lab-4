@@ -72,4 +72,4 @@ jobs:
       # Шаг отправки образа в Docker Hub
       - name: Build and push
         run: |
-          docker push bengobro/lab4
+          docker push bengobro/lab-4
