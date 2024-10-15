@@ -96,6 +96,10 @@ jobs:
 
   # Задача загрузки образа на сервер
   Deploy:
+
+    # Без задач Test и Publish не будет исполняться задача Deploy
+    needs: [Test, Deploy]
+
     runs-on: ubuntu-latest
     steps:
 
