@@ -95,3 +95,17 @@ jobs:
       - name: Build and push
         run: |
           docker push ${{ vars.DOCKERHUB_REPOSITORY }}
+
+  Deploy:
+    needs: [Test, Publish]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run command on remote server
+        uses: D3rHase/ssh-command-action@v0.2.2
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          user: ${{ secrets.SSH_USER }}
+          private_key: ${{ secrets.SSH_PRIVATE_KEY }}
