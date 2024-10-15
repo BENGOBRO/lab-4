@@ -64,26 +64,34 @@ jobs:
       - name: Build and push
         run: |
           docker push bengobro/lab-4
+
+  # Задача загрузки образа на сервер
   deploy:
     runs-on: ubuntu-latest
     steps:
+
+      # Шаг проверок от Github Аctions
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Шаг подключения к удаленному серверу
       - name: Connect to remote server
         run: |
           sshpass -p ${{ secrets.SSH_PRIVATE_KEY }} ssh -o StrictHostKeyChecking=no -p 22 ${{ secrets.SSH_USER}}@${{ secrets.SSH_HOST }}
         env:
           SSHPASS: ${{ secrets.SSH_PRIVATE_KEY}}
 
+      # Шаг загрузки образа из Docker Hub
       - name: Pull image
         run: |
           docker pull ${{ vars.DOCKERHUB_REPOSITORY }}:${{ vars.DOCKER_TAG_VERSION }}
 
+      # Шаг запуска контейнера
       - name: Run container
         run: |
           docker run ${{ vars.DOCKERHUB_REPOSITORY }}:${{ vars.DOCKER_TAG_VERSION }}
 
+      # Шаг остановки контейнера
       - name: Stop container
         run: |
           docker stop ${{ vars.DOCKERHUB_REPOSITORY }}:${{ vars.DOCKER_TAG_VERSION }}
