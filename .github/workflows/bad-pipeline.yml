@@ -90,8 +90,3 @@ jobs:
       - name: Run container
         run: |
           docker run ${{ vars.DOCKERHUB_REPOSITORY }}:${{ vars.DOCKER_TAG_VERSION }}
-
-      # Шаг остановки контейнера
-      - name: Stop container
-        run: |
-          docker stop ${{ vars.DOCKERHUB_REPOSITORY }}:${{ vars.DOCKER_TAG_VERSION }}
