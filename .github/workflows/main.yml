@@ -63,7 +63,11 @@ jobs:
       # Шаг создания нового тега образа
       - name: Tag image
         run: |
-          docker tag animal-tracking:latest bengobro/lab-4
+          docker tag animal-tracking bengobro/lab-4
+
+      - name: Check images
+        run: |
+          docker image ls
 
       # Шаг отправки образа в Docker Hub
       - name: Build and push
