@@ -2,8 +2,8 @@ name: bad pipeline
 
 # Указывем, когда запускать pipeline
 on:
-  pull_request:
-    branches: [ "main" ]
+  push:
+    branches: [ "feature/update-readme" ]
 
 # Указываем уровень доступа в репозитории
 permissions:
