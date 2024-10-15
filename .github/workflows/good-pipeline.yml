@@ -25,7 +25,7 @@ jobs:
 
       # Шаг проверок от actions
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Шаг установки JDK 17
       - name: Set up JDK 17
@@ -60,7 +60,7 @@ jobs:
 
       # Шаг установки JDK 17
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: ${{ vars.JAVA_VERSION }}
           distribution: ${{ vars.JAVA_DISTRIBUTION }}
