@@ -1,4 +1,4 @@
-name: good pipeline
+name: Good Pipeline
 
 # Указывем, когда запускать pipeline
 on:
@@ -15,7 +15,7 @@ permissions:
 jobs:
 
   # Прогонка тестов проекта
-  test:
+  Test:
 
     # Образ, на котором будет выполняться задача
     runs-on: ubuntu-latest
@@ -41,12 +41,12 @@ jobs:
           gradle-version: 8.1.1
 
       # Шаг сборки проекта через ./gradlew
-      - name: Run build with Gradle Wrapper
+      - name: Run tests
         run:
           ./gradlew clean build
 
   # Сборка и отправка в Docker Hub образа Docker
-  build-and-push-docker-image:
+  Publish:
 
     # Образ, на котором будет выполняться задача
     runs-on: ubuntu-latest
@@ -72,7 +72,7 @@ jobs:
           gradle-version: 8.1.1
 
       # Шаг сборки проекта через ./gradlew
-      - name: Run build with Gradle Wrapper
+      - name: Run build
         run:
           ./gradlew clean build -x test
 
