@@ -2,8 +2,6 @@ name: bad pipeline
 
 # Указывем, когда запускать pipeline
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
@@ -66,3 +64,26 @@ jobs:
       - name: Build and push
         run: |
           docker push bengobro/lab-4
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Connect to remote server
+        run: |
+          sshpass -p ${{ secrets.SSH_PRIVATE_KEY }} ssh -o StrictHostKeyChecking=no -p 22 ${{ secrets.SSH_USER}}@${{ secrets.SSH_HOST }}
+        env:
+          SSHPASS: ${{ secrets.SSH_PRIVATE_KEY}}
+
+      - name: Pull image
+        run: |
+          docker pull ${{ vars.DOCKERHUB_REPOSITORY }}:${{ vars.DOCKER_TAG_VERSION }}
+
+      - name: Run container
+        run: |
+          docker run ${{ vars.DOCKERHUB_REPOSITORY }}:${{ vars.DOCKER_TAG_VERSION }}
+
+      - name: Stop container
+        run: |
+          docker stop ${{ vars.DOCKERHUB_REPOSITORY }}:${{ vars.DOCKER_TAG_VERSION }}
