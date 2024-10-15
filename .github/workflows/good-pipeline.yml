@@ -98,7 +98,7 @@ jobs:
   Deploy:
 
     # Без задач Test и Publish не будет исполняться задача Deploy
-    needs: [Test, Deploy]
+    needs: [Test, Publish]
 
     runs-on: ubuntu-latest
     steps:
