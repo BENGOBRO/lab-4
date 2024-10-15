@@ -56,7 +56,7 @@ jobs:
 
       # Шаг проверок от actions
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Шаг установки JDK 17
       - name: Set up JDK 17
@@ -67,7 +67,7 @@ jobs:
 
       # Шаг установки Gradle
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           gradle-version: ${{ vars.GRADLE_VERSION }}
 
