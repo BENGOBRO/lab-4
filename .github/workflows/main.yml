@@ -55,17 +55,17 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and tag image
+      # Шаг сборки образа
+      - name: Build image
         run: |
-          docker build -t animal-tracking:latest .
+          docker build -t animal-tracking .
 
-#      # Шаг настройки Docker-образа
-#      - name: Set up Docker image
-#        uses: docker/setup-buildx-action@v3
-#
-      # Шаг сборки Docker-образа и его отправки в Docker Hub
+      # Шаг создания нового тега образа
+      - name: Tag image
+        run: |
+          docker tag animal-tracking:latest bengobro/lab-4
+
+      # Шаг отправки образа в Docker Hub
       - name: Build and push
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          tags: ${{ vars.DOCKERHUB_USERNAME }}/clockbox:latest
+        run: |
+          docker push bengobro/lab4
